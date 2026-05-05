@@ -1,29 +1,46 @@
 package com.example.lostandfound.common;
 
+import java.util.HashMap;
+import java.util.Map;
+
+// 加上泛型，支持返回任意类型的数据
 public class Result<T> {
     private int code;
-    private String msg;
+    private String message;
     private T data;
 
-    public static <T> Result<T> success(T data) {
-        Result<T> r = new Result<>();
-        r.setCode(200);
-        r.setMsg("成功");
-        r.setData(data);
-        return r;
+    // 私有构造
+    private Result(int code, String message, T data) {
+        this.code = code;
+        this.message = message;
+        this.data = data;
     }
 
-    public static <T> Result<T> error(String msg) {
-        Result<T> r = new Result<>();
-        r.setCode(500);
-        r.setMsg(msg);
-        return r;
+    // 成功响应：只返回消息
+    public static <T> Result<T> success(String message) {
+        return new Result<>(200, message, null);
     }
 
+    // 成功响应：返回消息 + 数据（对象/列表）
+    public static <T> Result<T> success(String message, T data) {
+        return new Result<>(200, message, data);
+    }
+
+    // 失败响应
+    public static <T> Result<T> error(String message) {
+        return new Result<>(500, message, null);
+    }
+
+    // 链式添加数据（兼容之前的put方法）
+    public Result<T> put(String key, Object value) {
+        if (this.data instanceof Map) {
+            ((Map<String, Object>) this.data).put(key, value);
+        }
+        return this;
+    }
+
+    // Getter/Setter
     public int getCode() { return code; }
-    public void setCode(int code) { this.code = code; }
-    public String getMsg() { return msg; }
-    public void setMsg(String msg) { this.msg = msg; }
+    public String getMessage() { return message; }
     public T getData() { return data; }
-    public void setData(T data) { this.data = data; }
 }

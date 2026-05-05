@@ -20,12 +20,12 @@ public class ItemController {
     // 首页展示所有物品
     @GetMapping("/home")
     public Result<List<Item>> home() {
-        return Result.success(itemService.getHomeList());
+        return Result.success("获取成功", itemService.getHomeList());
     }
 
-    // 分类导航 0失物 1拾物
+    // 分类导航
     @GetMapping("/type")
     public Result<List<Item>> getByType(@RequestParam Integer type) {
-        return Result.success(itemService.getListByType(type));
+        return Result.success("获取成功", itemService.getListByType(type));
     }
 }

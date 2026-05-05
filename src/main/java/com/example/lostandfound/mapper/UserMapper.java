@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface UserMapper {
 
+    User selectByUsername(String username);
+
     // 注册
     @Insert("INSERT INTO user(username,password,phone) VALUES(#{username},#{password},#{phone})")
     int register(User user);
