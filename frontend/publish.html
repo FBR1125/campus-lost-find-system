@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>发布信息</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f5f7fa;
+            font-family: "Microsoft YaHei", sans-serif;
+            padding-bottom: 70px;
+        }
+        .top-title {
+            text-align: center;
+            font-size: 22px;
+            padding: 20px 0;
+            color: #333;
+        }
+        /* 标签切换 */
+        .tab-box {
+            display: flex;
+            width: 90%;
+            margin: 0 auto 20px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            font-size: 16px;
+        }
+        .tab-item.active {
+            background: #409eff;
+            color: #fff;
+        }
+        /* 表单 */
+        .form-box {
+            width: 90%;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .form-item {
+            margin-bottom: 15px;
+        }
+        .form-item input,.form-item textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+        .form-item textarea {
+            height: 100px;
+            resize: none;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #409eff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        /* 底部导航 */
+        .footer-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: #fff;
+            display: flex;
+            border-top: 1px solid #eee;
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            line-height: 60px;
+            font-size: 16px;
+            color: #666;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: #409eff;
+        }
+        .hide {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="top-title">发布失物/招领信息</div>
+
+<!-- 切换标签 -->
+<div class="tab-box">
+    <div class="tab-item active" onclick="switchTab(0)">我丢失了东西</div>
+    <div class="tab-item" onclick="switchTab(1)">我捡到了东西</div>
+</div>
+
+<!-- 表单 -->
+<div class="form-box">
+    <div class="form-item">
+        <input type="text" id="name" placeholder="物品名称">
+    </div>
+    <div class="form-item">
+        <input type="text" id="place" placeholder="丢失/捡到地点">
+    </div>
+    <div class="form-item">
+        <textarea id="desc" placeholder="物品详细描述"></textarea>
+    </div>
+    <div class="form-item">
+        <input type="text" id="phone" placeholder="联系方式">
+    </div>
+    <button class="submit-btn" onclick="submitItem()">提交发布</button>
+</div>
+
+<!-- 底部导航 只剩 首页、发布 -->
+<div class="footer-nav">
+    <div class="nav-item" onclick="goIndex()">首页</div>
+    <div class="nav-item active" onclick="goPublish()">发布</div>
+</div>
+
+<script>
+    let type = 0; // 0丢失 1捡到
+
+    // 切换标签
+    function switchTab(t){
+        type = t;
+        let tabs = document.querySelectorAll(".tab-item");
+        tabs[0].classList.toggle("active", t===0);
+        tabs[1].classList.toggle("active", t===1);
+    }
+
+    // 提交发布（对接后端接口）
+    async function submitItem(){
+        let name = document.getElementById("name").value;
+        let place = document.getElementById("place").value;
+        let desc = document.getElementById("desc").value;
+        let phone = document.getElementById("phone").value;
+
+        if(!name || !place || !desc || !phone){
+            alert("请填写完整信息");
+            return;
+        }
+
+        let item = {
+            name:name,
+            place:place,
+            description:desc,
+            phone:phone,
+            type:type
+        };
+
+        let url = type===0
+            ? "http://localhost:8080/user/add/lost"
+            : "http://localhost:8080/user/add/found";
+
+        let res = await fetch(url,{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify(item)
+        });
+        let result = await res.json();
+        alert(result.message);
+        // 提交成功清空表单
+        if(result.code===200){
+            document.getElementById("name").value = "";
+            document.getElementById("place").value = "";
+            document.getElementById("desc").value = "";
+            document.getElementById("phone").value = "";
+        }
+    }
+
+    // 导航跳转
+    function goIndex(){location.href="index.html"}
+    function goPublish(){location.href="publish.html"}
+</script>
+</body>
+</html>

@@ -81,10 +81,16 @@
         let result = await res.json()
 
         if (result.code === 200) {
+            let user = result.data;
+            // 存入本地存储
+            localStorage.setItem("isLogin", "true");
+            localStorage.setItem("role", user.role);
+            localStorage.setItem("username", user.username);
+
             msg.innerText = "登录成功！"
             msg.style.color = "green"
-            // 登录成功后可以跳转到后台首页
-            location.href = "admin.html"
+            // 管理员也直接跳首页
+            location.href = "index.html";
         }
         else {
             msg.innerText = result.message

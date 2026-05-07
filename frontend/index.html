@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>校园失物招领 - 首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5f7fa;
+            font-family: "Microsoft YaHei", sans-serif;
+            padding-bottom: 70px;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: #409eff;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .header-btn {
+            padding: 8px 16px;
+            border: 1px solid white;
+            background: transparent;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .header-btn:hover {
+            background: white;
+            color: #409eff;
+        }
+
+        /* 登录后头像区域 */
+        .user-avatar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .avatar-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #fff;
+            color: #409eff;
+            text-align: center;
+            line-height: 36px;
+            font-weight: bold;
+        }
+
+        /* 搜索区 */
+        .search-section {
+            background: white;
+            padding: 30px;
+            margin: 30px auto;
+            max-width: 800px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        .search-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .search-box {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .search-input {
+            width: 70%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .search-btn {
+            padding: 12px 25px;
+            background: #409eff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .search-btn:hover {
+            background: #337ecc;
+        }
+
+        /* 内容区 */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto 40px;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* 物品卡片 */
+        .item-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .item-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .item-card h3 {
+            font-size: 17px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .item-card p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .item-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .tag-lost {
+            background: #ffe5e5;
+            color: #f56c6c;
+        }
+
+        .tag-found {
+            background: #e5f3ff;
+            color: #409eff;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 40px 0;
+        }
+
+        /* 底部导航 */
+        .footer-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: #fff;
+            display: flex;
+            border-top: 1px solid #eee;
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            line-height: 60px;
+            font-size: 16px;
+            color: #666;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: #409eff;
+        }
+    </style>
+</head>
+
+<body>
+<!-- 顶部导航 -->
+<div class="header">
+    <h1>校园失物招领系统</h1>
+    <div class="header-right" id="headerRight">
+        <!-- 未登录 显示注册登录 -->
+        <button class="header-btn" onclick="register()">注册</button>
+        <button class="header-btn" onclick="login()">登录</button>
+    </div>
+</div>
+
+<!-- 搜索区 -->
+<div class="search-section">
+    <div class="search-title">🔍 搜索失物信息</div>
+    <div class="search-box">
+        <input type="text" id="keyword" class="search-input" placeholder="输入物品名称、地点...">
+        <button class="search-btn" onclick="searchItem()">搜索</button>
+    </div>
+</div>
+
+<!-- 内容区 -->
+<div class="container">
+    <div class="page-title" id="list-title">最新失物信息</div>
+    <div class="item-list" id="item-list">
+        <div class="no-data">请点击搜索查看物品</div>
+    </div>
+</div>
+
+<!-- 底部导航 删掉我的，只剩 首页、发布 -->
+<div class="footer-nav">
+    <div class="nav-item active" onclick="goIndex()">首页</div>
+    <div class="nav-item" onclick="goPublish()">发布</div>
+</div>
+
+<script>
+    // 页面加载 判断登录状态
+    window.onload = function(){
+        checkLogin();
+    }
+
+    // 检查登录 切换右上角
+    function checkLogin(){
+        let isLogin = localStorage.getItem("isLogin");
+        let username = localStorage.getItem("username");
+        let role = localStorage.getItem("role");
+        let headerRight = document.getElementById("headerRight");
+
+        if(isLogin === "true"){
+            // 已登录：替换成头像+用户名
+            headerRight.innerHTML = `
+                    <div class="user-avatar" onclick="goPersonal()">
+                        <div class="avatar-img">${username.charAt(0)}</div>
+                        <span>${username}</span>
+                    </div>
+                `;
+        }
+    }
+
+    // 点击头像跳转个人中心/管理员后台
+    function goPersonal(){
+        let role = localStorage.getItem("role");
+        if(role === "admin"){
+            location.href = "admin.html";
+        }else{
+            location.href = "user_center.html";
+        }
+    }
+
+    // 搜索
+    async function searchItem() {
+        let keyword = document.getElementById("keyword").value.trim();
+        let res = await fetch("http://localhost:8080/user/search?keyword=" + encodeURIComponent(keyword));
+        let result = await res.json();
+        renderItems(result.data);
+        document.getElementById("list-title").innerText = keyword ? `"${keyword}" 搜索结果` : "最新失物信息";
+    }
+
+    // 渲染物品
+    function renderItems(items) {
+        let list = document.getElementById("item-list");
+        list.innerHTML = "";
+        if (!items || items.length === 0) {
+            list.innerHTML = '<div class="no-data">暂无相关物品信息</div>';
+            return;
+        }
+        items.forEach(item => {
+            let tagClass = item.type === 0 ? "tag-lost" : "tag-found";
+            let tagText = item.type === 0 ? "失物" : "招领";
+            list.innerHTML += `
+                <div class="item-card">
+                    <h3>${item.name}</h3>
+                    <p>地点：${item.place||'未知'}</p>
+                    <p>时间：${item.time||'未知'}</p>
+                    <p>描述：${item.description||'无'}</p>
+                    <span class="item-tag ${tagClass}">${tagText}</span>
+                </div>
+                `;
+        });
+    }
+
+    // 登录注册跳转
+    function login(){location.href="user_login.html"}
+    function register(){alert("请先完成注册页面开发");}
+
+    // 底部导航跳转
+    function goIndex(){location.href="index.html"}
+    function goPublish(){location.href="publish.html"}
+</script>
+</body>
+</html>

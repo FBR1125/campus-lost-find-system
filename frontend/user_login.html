@@ -72,7 +72,12 @@
         let password = document.getElementById("password").value;
         let msg = document.getElementById("msg");
 
-        // 普通用户登录接口（和管理员完全分开）
+        if(!username || !password){
+            msg.innerText = "账号密码不能为空";
+            msg.style.color = "red";
+            return;
+        }
+
         let res = await fetch("http://localhost:8080/user/login?username="+username+"&password="+password, {
             method: "GET"
         });
@@ -80,18 +85,22 @@
         let result = await res.json();
 
         if (result.code === 200) {
-            //判断角色是不是普通用户
             let user = result.data;
+            // 校验必须是普通用户
             if (user.role !== "user") {
-                msg.innerText = "无普通用户权限，请使用用户账号登录";
+                msg.innerText = "请使用普通用户账号登录";
                 msg.style.color = "red";
                 return;
             }
+            // 存入本地存储
+            localStorage.setItem("isLogin", "true");
+            localStorage.setItem("role", user.role);
+            localStorage.setItem("username", user.username);
 
-            // 登录成功
             msg.innerText = "登录成功！";
             msg.style.color = "green";
-            location.href = "user_center.html";
+            // 直接跳首页
+            location.href = "index.html";
         } else {
             msg.innerText = result.message;
             msg.style.color = "red";
