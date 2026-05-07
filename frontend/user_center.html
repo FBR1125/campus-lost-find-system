@@ -187,34 +187,86 @@
     <div class="stat-box">
         <div class="stat-item">
             <h4>我发布的失物</h4>
-            <div class="num">8</div>
+            <div class="num" id="myItemsCount">0</div>
         </div>
         <div class="stat-item">
             <h4>我发起的认领</h4>
-            <div class="num">5</div>
+            <div class="num" id="myClaimsCount">0</div>
         </div>
         <div class="stat-item">
             <h4>已找回物品</h4>
-            <div class="num">3</div>
+            <div class="num" id="foundCount">0</div>
         </div>
     </div>
 
     <!-- 功能操作 -->
     <div class="func-panel">
         <div class="func-title">我的功能</div>
-        <button class="btn btn-success">发布失物信息</button>
+        <button class="btn btn-success" onclick="goPublish()">发布失物信息</button>
         <button class="btn">我的失物记录</button>
         <button class="btn">我的认领记录</button>
         <button class="btn">修改密码</button>
+        <button class="btn" onclick="goHome()">返回主页</button>
         <button class="btn btn-danger" onclick="logout()">退出登录</button>
     </div>
 </div>
 
 <script>
+    // 页面加载时自动执行
+    window.onload = function(){
+        // 拿到当前登录用户ID
+        let userId = localStorage.getItem("userId");
+        let username = localStorage.getItem("username");
+
+        // 没登录 → 跳回首页
+        if(!userId){
+            alert("请先登录！");
+            location.href = "index.html";
+            return;
+        }
+
+        // 刷新页面上的用户名
+        document.querySelector(".info-detail h3").innerText = "用户名：" + username;
+        document.querySelector(".user-info").innerText = "欢迎你，" + username;
+
+        // 加载数据
+        loadMyItems(userId);
+        loadMyClaims(userId);
+    }
+
+    // 加载【我发布的失物】数量
+    async function loadMyItems(userId){
+        let res = await fetch("http://localhost:8080/user/my/items?userId="+userId);
+        let result = await res.json();
+        if(result.code === 200){
+            document.getElementById("myItemsCount").innerText = result.data.length;
+        }
+    }
+
+    // 加载【我发起的认领】数量
+    async function loadMyClaims(userId){
+        let res = await fetch("http://localhost:8080/user/my/claims?userId="+userId);
+        let result = await res.json();
+        if(result.code === 200){
+            document.getElementById("myClaimsCount").innerText = result.data.length;
+        }
+    }
+
+    // 返回主页
+    function goHome() {
+        location.href = "index.html";
+    }
+
     // 退出登录
     function logout() {
-        alert("退出登录成功！");
-        location.href = "user_login.html";
+        localStorage.clear();
+        alert("退出成功！");
+        location.href = "index.html";
+    }
+
+    // 跳转到发布页面
+    function goPublish() {
+        location.href = "publish.html";
     }
 </script>
 </body>

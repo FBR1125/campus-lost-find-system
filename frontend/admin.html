@@ -132,19 +132,19 @@
     <div class="card-box">
         <div class="card">
             <h3>总用户数</h3>
-            <div class="num">99+</div>
+            <div class="num" id="userCount">0</div>
         </div>
         <div class="card">
             <h3>失物记录</h3>
-            <div class="num">56</div>
+            <div class="num" id="itemCount">0</div>
         </div>
         <div class="card">
             <h3>待审核</h3>
-            <div class="num">12</div>
+            <div class="num" id="pendingCount">0</div>
         </div>
         <div class="card">
             <h3>已找回</h3>
-            <div class="num">32</div>
+            <div class="num" id="foundCount">0</div>
         </div>
     </div>
 
@@ -155,15 +155,54 @@
         <button class="btn">失物管理</button>
         <button class="btn">认领审核</button>
         <button class="btn">系统设置</button>
+        <button class="btn" onclick="goHome()">返回主页</button>
         <button class="btn logout-btn" onclick="logout()">退出登录</button>
     </div>
 </div>
 
 <script>
-    // 退出登录 → 跳回登录页
+    window.onload = function(){
+        let role = localStorage.getItem("role");
+        let username = localStorage.getItem("username");
+
+        //是否为管理员
+        if(role !== "admin"){
+            alert("无权限！");
+            location.href = "index.html";
+            return;
+        }
+
+        //动态更新管理员用户名
+        document.querySelector(".user-info").innerText = "欢迎你，管理员：" + username;
+
+        // 加载统计数字
+        loadAdminStats();
+    }
+
+    // 加载管理员统计数据
+    async function loadAdminStats(){
+        // 用户总数
+        let res = await fetch("http://localhost:8080/api/admin/stats");
+        let result = await res.json();
+        if (result.code === 200) {
+            let stats = result.data;
+            document.getElementById("userCount").innerText = stats.userCount;
+            document.getElementById("itemCount").innerText = stats.itemCount;
+            document.getElementById("pendingCount").innerText = stats.pendingCount;
+            document.getElementById("foundCount").innerText = stats.foundCount;
+        }
+    }
+
+    // 返回主页
+    function goHome() {
+        location.href = "index.html";
+    }
+
+    // 退出登录
     function logout() {
-        alert("退出成功！")
-        location.href = "admin_login.html"
+        localStorage.clear();
+        alert("退出成功！");
+        location.href = "index.html";
     }
 </script>
 </body>

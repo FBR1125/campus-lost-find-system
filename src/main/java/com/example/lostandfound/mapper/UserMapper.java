@@ -42,4 +42,12 @@ public interface UserMapper {
     // 个人中心：我的认领
     @Select("SELECT * FROM claim WHERE user_id=#{userId}")
     List<Claim> myClaims(Integer userId);
+
+    // 统计总用户数
+    @Select("SELECT COUNT(*) FROM user")
+    int countUser();
+
+    // 统计待审核认领数
+    @Select("SELECT COUNT(*) FROM claim WHERE status = 0")
+    int countPendingClaims();
 }

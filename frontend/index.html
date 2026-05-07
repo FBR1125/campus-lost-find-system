@@ -16,7 +16,6 @@
             padding-bottom: 70px;
         }
 
-        /* 顶部导航 */
         .header {
             background: #409eff;
             padding: 15px 30px;
@@ -46,15 +45,8 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
-            transition: 0.2s;
         }
 
-        .header-btn:hover {
-            background: white;
-            color: #409eff;
-        }
-
-        /* 登录后头像区域 */
         .user-avatar {
             display: flex;
             align-items: center;
@@ -72,7 +64,6 @@
             font-weight: bold;
         }
 
-        /* 搜索区 */
         .search-section {
             background: white;
             padding: 30px;
@@ -86,13 +77,6 @@
         .search-title {
             font-size: 20px;
             margin-bottom: 20px;
-            color: #333;
-        }
-
-        .search-box {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
         }
 
         .search-input {
@@ -110,14 +94,8 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
         }
 
-        .search-btn:hover {
-            background: #337ecc;
-        }
-
-        /* 内容区 */
         .container {
             max-width: 1000px;
             margin: 0 auto 40px;
@@ -127,10 +105,8 @@
         .page-title {
             font-size: 22px;
             margin-bottom: 20px;
-            color: #333;
         }
 
-        /* 物品卡片 */
         .item-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -141,37 +117,22 @@
             background: white;
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        }
-
-        .item-card h3 {
-            font-size: 17px;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .item-card p {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .item-tag {
-            display: inline-block;
-            padding: 3px 8px;
-            font-size: 12px;
-            border-radius: 4px;
-            margin-top: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
 
         .tag-lost {
             background: #ffe5e5;
             color: #f56c6c;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
         }
-
         .tag-found {
             background: #e5f3ff;
             color: #409eff;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
         }
 
         .no-data {
@@ -180,7 +141,6 @@
             padding: 40px 0;
         }
 
-        /* 底部导航 */
         .footer-nav {
             position: fixed;
             bottom: 0;
@@ -206,17 +166,14 @@
 </head>
 
 <body>
-<!-- 顶部导航 -->
 <div class="header">
     <h1>校园失物招领系统</h1>
     <div class="header-right" id="headerRight">
-        <!-- 未登录 显示注册登录 -->
         <button class="header-btn" onclick="register()">注册</button>
         <button class="header-btn" onclick="login()">登录</button>
     </div>
 </div>
 
-<!-- 搜索区 -->
 <div class="search-section">
     <div class="search-title">🔍 搜索失物信息</div>
     <div class="search-box">
@@ -225,7 +182,6 @@
     </div>
 </div>
 
-<!-- 内容区 -->
 <div class="container">
     <div class="page-title" id="list-title">最新失物信息</div>
     <div class="item-list" id="item-list">
@@ -233,47 +189,38 @@
     </div>
 </div>
 
-<!-- 底部导航 删掉我的，只剩 首页、发布 -->
 <div class="footer-nav">
     <div class="nav-item active" onclick="goIndex()">首页</div>
     <div class="nav-item" onclick="goPublish()">发布</div>
 </div>
 
 <script>
-    // 页面加载 判断登录状态
-    window.onload = function(){
-        checkLogin();
-    }
+    window.onload = checkLogin();
 
-    // 检查登录 切换右上角
-    function checkLogin(){
+    function checkLogin() {
         let isLogin = localStorage.getItem("isLogin");
         let username = localStorage.getItem("username");
-        let role = localStorage.getItem("role");
         let headerRight = document.getElementById("headerRight");
 
-        if(isLogin === "true"){
-            // 已登录：替换成头像+用户名
+        if (isLogin === "true") {
             headerRight.innerHTML = `
-                    <div class="user-avatar" onclick="goPersonal()">
-                        <div class="avatar-img">${username.charAt(0)}</div>
-                        <span>${username}</span>
-                    </div>
-                `;
+            <div class="user-avatar" onclick="goPersonal()">
+                <div class="avatar-img">${username.charAt(0)}</div>
+                <span>${username}</span>
+            </div>
+        `;
         }
     }
 
-    // 点击头像跳转个人中心/管理员后台
-    function goPersonal(){
+    function goPersonal() {
         let role = localStorage.getItem("role");
-        if(role === "admin"){
+        if (role === "admin") {
             location.href = "admin.html";
-        }else{
+        } else {
             location.href = "user_center.html";
         }
     }
 
-    // 搜索
     async function searchItem() {
         let keyword = document.getElementById("keyword").value.trim();
         let res = await fetch("http://localhost:8080/user/search?keyword=" + encodeURIComponent(keyword));
@@ -282,7 +229,6 @@
         document.getElementById("list-title").innerText = keyword ? `"${keyword}" 搜索结果` : "最新失物信息";
     }
 
-    // 渲染物品
     function renderItems(items) {
         let list = document.getElementById("item-list");
         list.innerHTML = "";
@@ -294,24 +240,20 @@
             let tagClass = item.type === 0 ? "tag-lost" : "tag-found";
             let tagText = item.type === 0 ? "失物" : "招领";
             list.innerHTML += `
-                <div class="item-card">
-                    <h3>${item.name}</h3>
-                    <p>地点：${item.place||'未知'}</p>
-                    <p>时间：${item.time||'未知'}</p>
-                    <p>描述：${item.description||'无'}</p>
-                    <span class="item-tag ${tagClass}">${tagText}</span>
-                </div>
-                `;
+        <div class="item-card">
+            <h3>${item.name}</h3>
+            <p>地点：${item.place||'未知'}</p>
+            <p>时间：${item.time||'未知'}</p>
+            <p>描述：${item.description||'无'}</p>
+            <span class="${tagClass}">${tagText}</span>
+        </div>`;
         });
     }
 
-    // 登录注册跳转
-    function login(){location.href="user_login.html"}
-    function register(){alert("请先完成注册页面开发");}
-
-    // 底部导航跳转
-    function goIndex(){location.href="index.html"}
-    function goPublish(){location.href="publish.html"}
+    function login() { location.href = "user_login.html"; }
+    function register() { alert("注册功能开发中"); }
+    function goIndex() { location.href = "index.html"; }
+    function goPublish() { location.href = "publish.html"; }
 </script>
 </body>
 </html>
