@@ -19,4 +19,27 @@ public class ItemService {
     public List<Item> getListByType(Integer type) {
         return itemMapper.findByType(type);
     }
+
+    // 发布
+    public int addItem(Item item) {
+        return itemMapper.addItem(item);
+    }
+
+    // 最新3条捡到
+    public List<Item> getLatestFound() {
+        return itemMapper.findLatestFound();
+    }
+
+    // 最新3条丢失
+    public List<Item> getLatestLost() {
+        return itemMapper.findLatestLost();
+    }
+
+    public int updateCheckStatus(Integer id, Integer status) {
+        return itemMapper.updateCheckStatus(id, status);
+    }
+
+    public List<Item> getPendingItems() {
+        return itemMapper.findPendingItems();
+    }
 }

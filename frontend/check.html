@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>发布审核</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f5f7fa;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .header {
+            background: #409eff;
+            color: white;
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: normal;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .back-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #409eff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .item-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .item-row {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .item-row:last-child {
+            border-bottom: none;
+        }
+        .info {
+            flex: 1;
+        }
+        .info p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .info .name {
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+        }
+        .btn-pass {
+            padding: 8px 16px;
+            background: #67c23a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        .btn-reject {
+            padding: 8px 16px;
+            background: #f56c6c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .empty-tip {
+            padding: 40px;
+            text-align: center;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>发布审核</h1>
+    <div></div>
+</div>
+
+<div class="container">
+    <a href="admin.html" class="back-btn">← 返回后台</a>
+    <div class="title">待审核列表</div>
+    <div class="item-list" id="list"></div>
+</div>
+
+<script>
+    window.onload = function() {
+        // 校验管理员权限
+        let role = localStorage.getItem("role");
+        if (role !== "admin") {
+            alert("无权限！");
+            location.href = "index.html";
+            return;
+        }
+        loadPendingItems();
+    }
+
+    // 加载所有未审核的发布（check_status=0）
+    async function loadPendingItems() {
+        let res = await fetch("http://localhost:8080/item/pending");
+        let result = await res.json();
+        let list = document.getElementById("list");
+
+        if (result.code !== 200 || result.data.length === 0) {
+            list.innerHTML = '<div class="empty-tip">暂无待审核发布</div>';
+            return;
+        }
+
+        list.innerHTML = "";
+        result.data.forEach(item => {
+            let typeText = item.type === 0 ? "丢失" : "捡到";
+            let row = document.createElement("div");
+            row.className = "item-row";
+            row.innerHTML = `
+                <div class="info">
+                    <p class="name">${item.name}（${typeText}）</p>
+                    <p>地点：${item.place}</p>
+                    <p>描述：${item.description || "无"}</p>
+                    <p>联系方式：${item.contact}</p>
+                </div>
+                <button class="btn-pass" onclick="check(${item.id}, 1)">通过</button>
+                <button class="btn-reject" onclick="check(${item.id}, 2)">驳回</button>
+            `;
+            list.appendChild(row);
+        });
+    }
+
+    // 审核操作：1通过 2驳回
+    async function check(id, status) {
+        let text = status === 1 ? "确定通过该发布吗？" : "确定驳回该发布吗？";
+        if (!confirm(text)) return;
+
+        let res = await fetch(`http://localhost:8080/item/check?id=${id}&status=${status}`, {
+            method: "POST"
+        });
+        let result = await res.json();
+        alert(result.message);
+        if (result.code === 200) {
+            // 刷新列表
+            loadPendingItems();
+        }
+    }
+</script>
+</body>
+</html>

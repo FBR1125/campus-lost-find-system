@@ -17,18 +17,33 @@ public class UserService {
 
     // 注册
     public Result<User> register(User user) {
+        // 1. 校验 账号(id) 是否重复
+        User existId = userMapper.selectById(user.getId());
+        if (existId != null) {
+            return Result.error("账号已存在！");
+        }
+
+        // 2. 校验 用户名(username) 是否重复
+        User existName = userMapper.selectByUsername(user.getUsername());
+        if (existName != null) {
+            return Result.error("用户名已存在！");
+        }
+
+        // 3. 插入数据
         int i = userMapper.register(user);
         return i > 0 ? Result.success("注册成功", user) : Result.error("注册失败");
     }
 
     // 登录
-    public Result<User> login(String username, String password) {
-        User user = userMapper.login(username, password);
-        if (user != null) {
-            return Result.success("登录成功", user);
-        } else {
-            return Result.error("账号或密码错误");
+    public Result<User> login(Integer id, String password) {
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            return Result.error("账号不存在");
         }
+        if (!user.getPassword().equals(password)) {
+            return Result.error("密码错误");
+        }
+        return Result.success("登录成功", user);
     }
 
     // 找回密码

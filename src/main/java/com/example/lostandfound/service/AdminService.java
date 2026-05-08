@@ -12,9 +12,9 @@ public class AdminService {
     @Autowired
     private UserMapper userMapper;
 
-    public Result<User> login(String username, String password) {
+    public Result<User> login(Integer id, String password) {
         // 1. 查询用户
-        User user = userMapper.selectByUsername(username);
+        User user = userMapper.selectById(id);
         if (user == null) {
             return Result.error("用户不存在");
         }

@@ -22,8 +22,8 @@ public class UserController {
 
     // 登录
     @GetMapping("/login")
-    public Result login(String username,String password){
-        return userService.login(username,password);
+    public Result login(Integer id,String password){
+        return userService.login(id,password);
     }
 
     // 找回密码

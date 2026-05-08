@@ -8,17 +8,16 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 public interface UserMapper {
-
+    //用户名是否相同
+    @Select("SELECT * FROM user WHERE username=#{username}")
     User selectByUsername(String username);
 
-    // 注册
-    @Insert("INSERT INTO user(username,password,phone) VALUES(#{username},#{password},#{phone})")
+    // 注册：包含 id、username、password、phone
+    @Insert("INSERT INTO user(id, username, password, phone, create_time) VALUES(#{id}, #{username}, #{password}, #{phone}, NOW())")
     int register(User user);
-
     // 登录
-    @Select("SELECT * FROM user WHERE username=#{username} AND password=#{password}")
-    User login(String username, String password);
-
+    @Select("SELECT * FROM user WHERE id=#{id}")
+    User selectById(Integer id);
     // 找回密码
     @Select("SELECT password FROM user WHERE username=#{username} AND phone=#{phone}")
     String findPassword(String username, String phone);
@@ -50,4 +49,6 @@ public interface UserMapper {
     // 统计待审核认领数
     @Select("SELECT COUNT(*) FROM claim WHERE status = 0")
     int countPendingClaims();
+
+
 }

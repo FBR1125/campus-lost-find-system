@@ -34,6 +34,7 @@
             text-align: center;
             padding: 12px 0;
             font-size: 16px;
+            cursor: pointer;
         }
         .tab-item.active {
             background: #409eff;
@@ -69,6 +70,7 @@
             border: none;
             border-radius: 6px;
             font-size: 16px;
+            cursor: pointer;
         }
         /* 底部导航 */
         .footer-nav {
@@ -120,6 +122,9 @@
     <div class="form-item">
         <input type="text" id="phone" placeholder="联系方式">
     </div>
+    <div style="color:red; font-size:12px; margin-bottom:8px;">
+        请说明何种联系方式（微信/QQ/电话），否则无法通过审核！
+    </div>
     <button class="submit-btn" onclick="submitItem()">提交发布</button>
 </div>
 
@@ -130,59 +135,65 @@
 </div>
 
 <script>
-    let type = 0; // 0丢失 1捡到
+    // 规则：0=丢失 1=捡到
+    let type = 0;
 
     // 切换标签
-    function switchTab(t){
+    function switchTab(t) {
         type = t;
         let tabs = document.querySelectorAll(".tab-item");
-        tabs[0].classList.toggle("active", t===0);
-        tabs[1].classList.toggle("active", t===1);
+        tabs[0].classList.toggle("active", t === 0);
+        tabs[1].classList.toggle("active", t === 1);
     }
 
-    // 提交发布（对接后端接口）
-    async function submitItem(){
-        let name = document.getElementById("name").value;
-        let place = document.getElementById("place").value;
-        let desc = document.getElementById("desc").value;
-        let phone = document.getElementById("phone").value;
+    // 提交发布（对接你统一的后端接口 /item/add）
+    async function submitItem() {
+        let name = document.getElementById("name").value.trim();
+        let place = document.getElementById("place").value.trim();
+        let desc = document.getElementById("desc").value.trim();
+        let phone = document.getElementById("phone").value.trim();
+        let userId = localStorage.getItem("userId");
 
-        if(!name || !place || !desc || !phone){
-            alert("请填写完整信息");
+        // 只校验必填项：物品名称、地点、联系方式
+        if (!name || !place || !phone) {
+            alert("请填写物品名称、地点和联系方式");
             return;
         }
 
+        // 物品描述是可选的，空着就传空字符串
         let item = {
-            name:name,
-            place:place,
-            description:desc,
-            phone:phone,
-            type:type
+            name: name,
+            place: place,
+            description: desc, // 不写也没关系，会传空字符串
+            contact: phone,
+            type: type,
+            userId: userId,
+            status: 0
         };
 
-        let url = type===0
-            ? "http://localhost:8080/user/add/lost"
-            : "http://localhost:8080/user/add/found";
-
-        let res = await fetch(url,{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify(item)
-        });
-        let result = await res.json();
-        alert(result.message);
-        // 提交成功清空表单
-        if(result.code===200){
-            document.getElementById("name").value = "";
-            document.getElementById("place").value = "";
-            document.getElementById("desc").value = "";
-            document.getElementById("phone").value = "";
+        try {
+            let res = await fetch("http://localhost:8080/item/add", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(item)
+            });
+            let result = await res.json();
+            alert(result.message);
+            if (result.code === 200) {
+                // 提交成功清空表单
+                document.getElementById("name").value = "";
+                document.getElementById("place").value = "";
+                document.getElementById("desc").value = "";
+                document.getElementById("phone").value = "";
+            }
+        } catch (e) {
+            alert("发布失败，请检查网络或后端服务");
         }
     }
 
     // 导航跳转
-    function goIndex(){location.href="index.html"}
-    function goPublish(){location.href="publish.html"}
+    function goIndex() { location.href = "index.html" }
+    function goPublish() { location.href = "publish.html" }
 </script>
 </body>
 </html>

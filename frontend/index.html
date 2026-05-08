@@ -195,7 +195,17 @@
 </div>
 
 <script>
-    window.onload = checkLogin();
+    window.onload = function () {
+        checkLogin();
+        loadHomeList(); // 自动加载已审核的最新物品
+    };
+
+    // 自动加载首页列表（已审核）
+    async function loadHomeList() {
+        let res = await fetch("http://localhost:8080/item/home");
+        let result = await res.json();
+        renderItems(result.data);
+    }
 
     function checkLogin() {
         let isLogin = localStorage.getItem("isLogin");
@@ -243,7 +253,6 @@
         <div class="item-card">
             <h3>${item.name}</h3>
             <p>地点：${item.place||'未知'}</p>
-            <p>时间：${item.time||'未知'}</p>
             <p>描述：${item.description||'无'}</p>
             <span class="${tagClass}">${tagText}</span>
         </div>`;
@@ -251,7 +260,9 @@
     }
 
     function login() { location.href = "user_login.html"; }
-    function register() { alert("注册功能开发中"); }
+    function register(){
+        location.href = "register.html";
+    }
     function goIndex() { location.href = "index.html"; }
     function goPublish() { location.href = "publish.html"; }
 </script>

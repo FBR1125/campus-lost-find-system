@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>用户注册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f0f5ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .register-box {
+            width: 420px;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #409eff;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #409eff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .back-btn {
+            background: transparent;
+            color: #409eff;
+            border: 1px solid #409eff;
+            margin-top: 8px;
+        }
+        #msg {
+            text-align: center;
+            margin-top: 15px;
+            color: red;
+        }
+        .back-home {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 16px;
+            color: #409eff;
+            text-decoration: none;
+        }
+        .back-home:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="register-box">
+    <h2>用户注册</h2>
+    <a href="index.html" class="back-home">返回主页 -></a>
+    <input type="number" id="id" placeholder="请输入账号（数字）">
+    <input type="text" id="username" placeholder="请输入用户名">
+    <input type="password" id="password" placeholder="请输入密码">
+    <input type="text" id="phone" placeholder="请输入电话号码">
+    <button onclick="register()">注册</button>
+    <button class="back-btn" onclick="back()">返回登录</button>
+    <div id="msg"></div>
+</div>
+
+<script>
+    async function register() {
+        let id = document.getElementById("id").value.trim();
+        let username = document.getElementById("username").value.trim();
+        let password = document.getElementById("password").value.trim();
+        let phone = document.getElementById("phone").value.trim();
+        let msg = document.getElementById("msg");
+
+        // 1. 校验账号必须是数字
+        if (isNaN(id) || id === "") {
+            msg.innerText = "请输入数字账号！";
+            msg.style.color = "red";
+            return;
+        }
+
+        // 2. 校验密码长度 6~15 位
+        if (password.length < 6 || password.length > 15) {
+            msg.innerText = "密码必须是6~15位！";
+            msg.style.color = "red";
+            return;
+        }
+
+        // 3. 校验手机号格式
+        let phoneReg = /^1[3-9]\d{9}$/;
+        if (!phoneReg.test(phone)) {
+            msg.innerText = "请输入正确的手机号！";
+            msg.style.color = "red";
+            return;
+        }
+
+        // 4. 校验必填项不能为空
+        if (!username || !password || !phone) {
+            msg.innerText = "请填写完整信息！";
+            msg.style.color = "red";
+            return;
+        }
+
+        try {
+            // 发送注册请求
+            let res = await fetch("http://localhost:8080/user/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    id: id,
+                    username: username,
+                    password: password,
+                    phone: phone
+                })
+            });
+
+            let result = await res.json();
+
+            if (result.code === 200) {
+                msg.innerText = "注册成功！即将跳转到登录";
+                msg.style.color = "green";
+                setTimeout(() => {
+                    location.href = "user_login.html";
+                }, 1500);
+            } else {
+                // 账号问题会在这里提示（后端返回）
+                msg.innerText = result.message;
+                msg.style.color = "red";
+            }
+        } catch (error) {
+            msg.innerText = "网络错误，请重试";
+            msg.style.color = "red";
+        }
+    }
+
+    function back() {
+        location.href = "user_login.html";
+    }
+</script>
+</body>
+</html>

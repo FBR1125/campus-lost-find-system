@@ -30,9 +30,9 @@ public class AdminController {
     // 管理员登录
     @PostMapping("/login")
     public Result login(@RequestBody Map<String, String> map) {
-        String username = map.get("username");
+        Integer id = Integer.valueOf(map.get("id"));
         String password = map.get("password");
-        return adminService.login(username, password);
+        return adminService.login(id, password);
     }
 
     //管理员统计接口
@@ -62,6 +62,6 @@ public class AdminController {
     // 浏览器直接访问测试管理员登录
     @GetMapping("/testLogin")
     public Result<User> testLogin(){
-        return adminService.login("admin", "admin123");
+        return adminService.login(1, "admin123");
     }
 }

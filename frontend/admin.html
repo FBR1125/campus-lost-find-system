@@ -152,8 +152,7 @@
     <div class="func-box">
         <div class="func-title">功能管理</div>
         <button class="btn">用户管理</button>
-        <button class="btn">失物管理</button>
-        <button class="btn">认领审核</button>
+        <button class="btn" onclick="goCheck()">发布审核</button>
         <button class="btn">系统设置</button>
         <button class="btn" onclick="goHome()">返回主页</button>
         <button class="btn logout-btn" onclick="logout()">退出登录</button>
@@ -191,6 +190,11 @@
             document.getElementById("pendingCount").innerText = stats.pendingCount;
             document.getElementById("foundCount").innerText = stats.foundCount;
         }
+    }
+
+    // 跳转到发布审核页面
+    function goCheck() {
+        location.href = "check.html";
     }
 
     // 返回主页
