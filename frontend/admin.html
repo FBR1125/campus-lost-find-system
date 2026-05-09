@@ -157,6 +157,26 @@
         <button class="btn" onclick="goHome()">返回主页</button>
         <button class="btn logout-btn" onclick="logout()">退出登录</button>
     </div>
+
+    <!-- 修改密码模块 -->
+    <div style="background: white; border-radius: 8px; padding: 20px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <h3 style="margin-bottom: 15px; color: #333;">修改管理员密码</h3>
+        <div style="margin-bottom: 10px;">
+            <label style="display: inline-block; width: 100px; font-size: 15px; color: #666;">原密码：</label>
+            <input type="password" id="adminOldPwd" placeholder="请输入当前密码" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label style="display: inline-block; width: 100px; font-size: 15px; color: #666;">新密码：</label>
+            <input type="password" id="adminNewPwd" placeholder="请输入新密码" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label style="display: inline-block; width: 100px; font-size: 15px; color: #666;">确认新密码：</label>
+            <input type="password" id="adminRePwd" placeholder="再次输入新密码" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
+        </div>
+        <button onclick="adminModifyPwd()" style="padding: 8px 20px; background: #409eff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            确认修改
+        </button>
+    </div>
 </div>
 
 <script>
@@ -207,6 +227,41 @@
         localStorage.clear();
         alert("退出成功！");
         location.href = "index.html";
+    }
+
+    // 管理员修改密码
+    async function adminModifyPwd(){
+        let userId = localStorage.getItem("userId");
+        let oldPwd = document.getElementById("adminOldPwd").value.trim();
+        let newPwd = document.getElementById("adminNewPwd").value.trim();
+        let rePwd = document.getElementById("adminRePwd").value.trim();
+
+        // 非空校验
+        if(!oldPwd || !newPwd || !rePwd){
+            alert("请填写完整！");
+            return;
+        }
+
+        // 调用统一的修改密码接口
+        let res = await fetch("http://localhost:8080/user/updatePwd",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                userId: userId,
+                oldPwd: oldPwd,
+                newPwd: newPwd,
+                rePwd: rePwd
+            })
+        });
+        let result = await res.json();
+        alert(result.message);
+        // 修改成功清空登录状态，跳转到管理员登录页
+        if(result.code === 200){
+            localStorage.clear();
+            location.href = "admin_login.html";
+        }
     }
 </script>
 </body>
