@@ -43,4 +43,8 @@ public interface ItemMapper {
     // 获取所有待审核的发布（check_status=0）
     @Select("SELECT * FROM item WHERE check_status = 0 ORDER BY create_time DESC")
     List<Item> findPendingItems();
+
+    // 统计已审核通过的物品数（check_status=1）
+    @Select("SELECT COUNT(*) FROM item WHERE check_status = 1")
+    int countApprovedItems();
 }

@@ -45,11 +45,11 @@ public class AdminController {
         stats.put("userCount", userCount);
 
         // 2. 失物记录总数
-        int itemCount = itemMapper.countAll();
+        int itemCount = itemMapper.countApprovedItems();
         stats.put("itemCount", itemCount);
 
-        // 3. 待审核认领数（status=0）
-        int pendingCount = userMapper.countPendingClaims();
+        // 3. 待审核发布（check_status=0）
+        int pendingCount = itemMapper.findPendingItems().size();
         stats.put("pendingCount", pendingCount);
 
         // 4. 已找回物品数（status=1）
