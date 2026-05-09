@@ -9,7 +9,8 @@ import java.util.List;
 
 public interface ItemMapper {
 
-    @Select("SELECT * FROM item ORDER BY create_time DESC")
+    // 首页查询 → 只显示已审核通过的物品
+    @Select("SELECT * FROM item WHERE check_status = 1 ORDER BY create_time DESC")
     List<Item> findAll();
 
     @Select("SELECT * FROM item WHERE type = #{type} ORDER BY create_time DESC")
