@@ -5,12 +5,17 @@ import com.example.lostandfound.entity.Item;
 import com.example.lostandfound.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.example.lostandfound.entity.User;
+import com.example.lostandfound.service.UserService;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/item")
 public class ItemController {
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private ItemService itemService;
@@ -30,6 +35,14 @@ public class ItemController {
     // 发布物品
     @PostMapping("/add")
     public Result<?> addItem(@RequestBody Item item) {
+        // 查询用户角色
+        User user = userService.getById(item.getUserId());
+
+        // 如果是管理员，直接禁止发布
+        if (user != null && "admin".equals(user.getRole())) {
+            return Result.error("管理员无法发布物品");
+        }
+
         int i = itemService.addItem(item);
         if (i > 0) {
             return Result.success("发布成功");

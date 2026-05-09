@@ -94,4 +94,9 @@ public class UserService {
         // 2. 更新
         return userMapper.updatePwd(userId, newPwd) > 0;
     }
+
+    // 为发布页面校验获取id
+    public User getById(Integer id) {
+        return userMapper.selectById(id);
+    }
 }

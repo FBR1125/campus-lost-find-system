@@ -193,7 +193,17 @@
 
     // 导航跳转
     function goIndex() { location.href = "index.html" }
-    function goPublish() { location.href = "publish.html" }
+    // 跳转发布
+    function goPublish() {
+        let role = localStorage.getItem("role");
+
+        // 只有普通用户才能发布
+        if (role === "user") {
+            location.href = "publish.html";
+        } else {
+            alert("管理员无法发布物品！");
+        }
+    }
 </script>
 </body>
 </html>

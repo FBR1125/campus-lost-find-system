@@ -310,8 +310,14 @@
         location.href = "index.html";
     }
 
+    // 跳转发布
     function goPublish() {
-        location.href = "publish.html";
+        let role = localStorage.getItem("role");
+        if(role === 'user'){
+            location.href = "publish.html";
+        } else {
+            alert("管理员无法发布物品！");
+        }
     }
 
     async function modifyPwd(){
