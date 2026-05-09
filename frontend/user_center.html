@@ -121,6 +121,7 @@
             border-radius: 10px;
             padding: 30px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
         }
 
         .func-title {
@@ -158,6 +159,43 @@
         }
         .btn-success:hover {
             background: #55a32f;
+        }
+
+        /* 修改密码面板 */
+        .pwd-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .pwd-row {
+            margin-bottom: 15px;
+        }
+
+        .pwd-row label {
+            display: inline-block;
+            width: 100px;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .pwd-row input {
+            padding: 8px 12px;
+            width: 280px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .pwd-btn {
+            padding: 8px 20px;
+            background: #409eff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -205,36 +243,47 @@
         <button class="btn btn-success" onclick="goPublish()">发布失物信息</button>
         <button class="btn">我的失物记录</button>
         <button class="btn">我的认领记录</button>
-        <button class="btn">修改密码</button>
+        <button class="btn" onclick="logout()">退出登录</button>
         <button class="btn" onclick="goHome()">返回主页</button>
-        <button class="btn btn-danger" onclick="logout()">退出登录</button>
+    </div>
+
+    <!-- 修改密码 -->
+    <div class="pwd-panel">
+        <div class="func-title">修改密码</div>
+        <div class="pwd-row">
+            <label>原密码：</label>
+            <input type="password" id="oldPwd" placeholder="请输入当前密码">
+        </div>
+        <div class="pwd-row">
+            <label>新密码：</label>
+            <input type="password" id="newPwd" placeholder="请输入新密码">
+        </div>
+        <div class="pwd-row">
+            <label>确认新密码：</label>
+            <input type="password" id="rePwd" placeholder="再次输入新密码">
+        </div>
+        <button class="pwd-btn" onclick="modifyPwd()">确认修改密码</button>
     </div>
 </div>
 
 <script>
-    // 页面加载时自动执行
     window.onload = function(){
-        // 拿到当前登录用户ID
         let userId = localStorage.getItem("userId");
         let username = localStorage.getItem("username");
 
-        // 没登录 → 跳回首页
         if(!userId){
             alert("请先登录！");
             location.href = "index.html";
             return;
         }
 
-        // 刷新页面上的用户名
         document.querySelector(".info-detail h3").innerText = "用户名：" + username;
         document.querySelector(".user-info").innerText = "欢迎你，" + username;
 
-        // 加载数据
         loadMyItems(userId);
         loadMyClaims(userId);
     }
 
-    // 加载【我发布的失物】数量
     async function loadMyItems(userId){
         let res = await fetch("http://localhost:8080/user/my/items?userId="+userId);
         let result = await res.json();
@@ -243,7 +292,6 @@
         }
     }
 
-    // 加载【我发起的认领】数量
     async function loadMyClaims(userId){
         let res = await fetch("http://localhost:8080/user/my/claims?userId="+userId);
         let result = await res.json();
@@ -252,21 +300,49 @@
         }
     }
 
-    // 返回主页
     function goHome() {
         location.href = "index.html";
     }
 
-    // 退出登录
     function logout() {
         localStorage.clear();
         alert("退出成功！");
         location.href = "index.html";
     }
 
-    // 跳转到发布页面
     function goPublish() {
         location.href = "publish.html";
+    }
+
+    async function modifyPwd(){
+        let userId = localStorage.getItem("userId");
+        let oldPwd = document.getElementById("oldPwd").value.trim();
+        let newPwd = document.getElementById("newPwd").value.trim();
+        let rePwd = document.getElementById("rePwd").value.trim();
+
+        if(!oldPwd || !newPwd || !rePwd){
+            alert("请填写完整！");
+            return;
+        }
+
+        let res = await fetch("http://localhost:8080/user/updatePwd",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                userId:userId,
+                oldPwd:oldPwd,
+                newPwd:newPwd,
+                rePwd:rePwd
+            })
+        });
+        let result = await res.json();
+        alert(result.message);
+        if(result.code === 200){
+            localStorage.clear();
+            location.href = "user_login.html";
+        }
     }
 </script>
 </body>

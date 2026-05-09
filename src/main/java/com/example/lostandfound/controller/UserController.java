@@ -1,5 +1,6 @@
 package com.example.lostandfound.controller;
 
+import java.util.Map;
 import com.example.lostandfound.common.Result;
 import com.example.lostandfound.entity.User;
 import com.example.lostandfound.entity.Item;
@@ -68,5 +69,30 @@ public class UserController {
     @GetMapping("/my/claims")
     public Result myClaims(Integer userId){
         return userService.myClaims(userId);
+    }
+
+    @PostMapping("/updatePwd")
+    public Result updatePwd(@RequestBody Map<String,String> map){
+        // 从localStorage存的userId拿
+        Integer userId = Integer.parseInt(map.get("userId"));
+        String oldPwd = map.get("oldPwd");
+        String newPwd = map.get("newPwd");
+        String rePwd = map.get("rePwd");
+
+        // 非空
+        if(oldPwd==null || newPwd==null || rePwd==null){
+            return Result.error("不能为空");
+        }
+        // 两次新密码一致
+        if(!newPwd.equals(rePwd)){
+            return Result.error("两次新密码不一致");
+        }
+
+        boolean res = userService.updatePassword(userId, oldPwd, newPwd);
+        if(res){
+            return Result.success("密码修改成功，请重新登录");
+        }else{
+            return Result.error("原密码错误");
+        }
     }
 }

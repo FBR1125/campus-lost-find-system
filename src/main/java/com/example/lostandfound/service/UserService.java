@@ -85,4 +85,15 @@ public class UserService {
         List<Claim> list = userMapper.myClaims(uid);
         return Result.success("查询成功", list);
     }
+
+    // 改密码
+    public boolean updatePassword(Integer userId, String oldPwd, String newPwd) {
+        // 1. 查原密码
+        String dbPwd = userMapper.getPwdById(userId);
+        if(!oldPwd.equals(dbPwd)){
+            return false;
+        }
+        // 2. 更新
+        return userMapper.updatePwd(userId, newPwd) > 0;
+    }
 }

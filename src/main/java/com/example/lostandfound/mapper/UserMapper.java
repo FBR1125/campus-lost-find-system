@@ -1,5 +1,7 @@
 package com.example.lostandfound.mapper;
 
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
 import com.example.lostandfound.entity.User;
 import com.example.lostandfound.entity.Item;
 import com.example.lostandfound.entity.Claim;
@@ -49,6 +51,14 @@ public interface UserMapper {
     // 统计待审核认领数
     @Select("SELECT COUNT(*) FROM claim WHERE status = 0")
     int countPendingClaims();
+
+    // 根据id查密码
+    @Select("select password from user where id = #{id}")
+    String getPwdById(@Param("id") Integer id);
+
+    // 修改密码
+    @Update("update user set password = #{newPwd} where id = #{id}")
+    int updatePwd(@Param("id") Integer id, @Param("newPwd") String newPwd);
 
 
 }
