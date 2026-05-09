@@ -26,6 +26,17 @@ public class Result<T> {
         return new Result<>(200, message, data);
     }
 
+
+    // 成功：只返回数据（给我的失物记录用）
+    public static <T> Result<T> success(T data) {
+        return new Result<>(200, "操作成功", data);
+    }
+
+    // 成功：空参数
+    public static <T> Result<T> success() {
+        return new Result<>(200, "操作成功", null);
+    }
+
     // 失败响应
     public static <T> Result<T> error(String message) {
         return new Result<>(500, message, null);

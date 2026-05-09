@@ -37,12 +37,12 @@ public interface UserMapper {
     int applyClaim(Claim claim);
 
     // 个人中心：我的发布
-    @Select("SELECT * FROM item WHERE user_id=#{userId}")
-    List<Item> myItems(Integer userId);
+    @Select("SELECT * FROM item WHERE user_id = #{userId} ORDER BY create_time DESC")
+    List<Item> myItems(@Param("userId") Integer userId);
 
     // 个人中心：我的认领
-    @Select("SELECT * FROM claim WHERE user_id=#{userId}")
-    List<Claim> myClaims(Integer userId);
+    @Select("SELECT * FROM claim WHERE user_id = #{userId} ORDER BY create_time DESC")
+    List<Claim> myClaims(@Param("userId") Integer userId);
 
     // 统计总用户数
     @Select("SELECT COUNT(*) FROM user")
@@ -59,6 +59,5 @@ public interface UserMapper {
     // 修改密码
     @Update("update user set password = #{newPwd} where id = #{id}")
     int updatePwd(@Param("id") Integer id, @Param("newPwd") String newPwd);
-
 
 }

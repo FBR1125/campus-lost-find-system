@@ -75,15 +75,13 @@ public class UserService {
     }
 
     // 我的发布
-    public Result<List<Item>> myItems(Integer uid) {
-        List<Item> list = userMapper.myItems(uid);
-        return Result.success("查询成功", list);
+    public List<Item> getMyItems(Integer userId) {
+        return userMapper.myItems(userId);
     }
 
     // 我的认领
-    public Result<List<Claim>> myClaims(Integer uid) {
-        List<Claim> list = userMapper.myClaims(uid);
-        return Result.success("查询成功", list);
+    public List<Claim> getMyClaims(Integer userId) {
+        return userMapper.myClaims(userId);
     }
 
     // 改密码

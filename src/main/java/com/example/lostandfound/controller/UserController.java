@@ -61,15 +61,16 @@ public class UserController {
 
     // 个人中心：我的发布
     @GetMapping("/my/items")
-    public Result myItems(Integer userId){
-        return userService.myItems(userId);
+    public Result myItems(@RequestParam Integer userId) {
+        return Result.success(userService.getMyItems(userId));
     }
 
     // 个人中心：我的认领
     @GetMapping("/my/claims")
-    public Result myClaims(Integer userId){
-        return userService.myClaims(userId);
+    public Result myClaims(@RequestParam Integer userId) {
+        return Result.success(userService.getMyClaims(userId));
     }
+
 
     @PostMapping("/updatePwd")
     public Result updatePwd(@RequestBody Map<String,String> map){

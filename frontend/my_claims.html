@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>我的认领记录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f5f7fa;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .header {
+            background: #409eff;
+            color: white;
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: normal;
+        }
+        .back-btn {
+            background: white;
+            color: #409eff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .claim-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .claim-item p {
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 15px;
+        }
+        .status {
+            font-size: 13px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .status0 { background: #fff7e6; color: #faad14; }
+        .status1 { background: #e6ffed; color: #52c41a; }
+        .status2 { background: #fff2f0; color: #f5222d; }
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 60px 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>我的认领记录</h1>
+    <button class="back-btn" onclick="goBack()">返回个人中心</button>
+</div>
+
+<div class="container" id="claimList">
+    加载中...
+</div>
+
+<script>
+    window.onload = async function () {
+        let userId = localStorage.getItem("userId");
+        if (!userId) {
+            alert("请先登录！");
+            location.href = "user_login.html";
+            return;
+        }
+        loadMyClaims(userId);
+    }
+
+    // 加载我的认领
+    async function loadMyClaims(userId) {
+        try {
+            let res = await fetch("http://localhost:8080/user/my/claims?userId=" + userId);
+            let result = await res.json();
+            let box = document.getElementById("claimList");
+
+            if (!result.data || result.data.length === 0) {
+                box.innerHTML = `<div class="no-data">暂无认领记录</div>`;
+                return;
+            }
+
+            box.innerHTML = "";
+            result.data.forEach(claim => {
+                let statusText = "";
+                let statusClass = "";
+
+                if (claim.status === 0) {
+                    statusText = "待审核";
+                    statusClass = "status0";
+                } else if (claim.status === 1) {
+                    statusText = "已通过";
+                    statusClass = "status1";
+                } else {
+                    statusText = "已拒绝";
+                    statusClass = "status2";
+                }
+
+                box.innerHTML += `
+                <div class="claim-item">
+                    <p>物品ID：${claim.itemId}</p>
+                    <p>认领说明：${claim.description || '无'}</p>
+                    <p>联系方式：${claim.contact || '未填写'}</p>
+                    <span class="status ${statusClass}">${statusText}</span>
+                </div>
+                `;
+            });
+        } catch (e) {
+            document.getElementById("claimList").innerHTML = `<div class="no-data">暂无认领记录</div>`;
+        }
+    }
+
+    function goBack() {
+        location.href = "user_center.html";
+    }
+</script>
+
+</body>
+</html>
