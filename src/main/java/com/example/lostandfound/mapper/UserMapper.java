@@ -1,5 +1,7 @@
 package com.example.lostandfound.mapper;
 
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Param;
@@ -76,5 +78,13 @@ public interface UserMapper {
             @Result(property = "createTime", column = "create_time")
     })
     List<User> selectAllUser();
+
+    // 删除用户
+    @Delete("DELETE FROM user WHERE id = #{userId}")
+    void deleteById(Integer userId);
+
+    // 重置密码为 123456
+    @Update("UPDATE user SET password = '123456' WHERE id = #{userId}")
+    void resetPassword(Integer userId);
 
 }

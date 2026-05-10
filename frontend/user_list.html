@@ -46,6 +46,29 @@
         th {
             background: #f0f4f9;
         }
+
+        /* 按钮样式 */
+        .del-btn {
+            background: #f56c6c;
+            color: #fff;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 4px;
+        }
+        .reset-btn {
+            background: #ff9800;
+            color: #fff;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .admin-text {
+            color: #ff4444;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -63,16 +86,16 @@
         <th>手机号</th>
         <th>注册时间</th>
         <th>登录密码</th>
+        <th>操作</th> <!-- 新增 -->
     </tr>
     </thead>
     <tbody id="userBody">
-    <tr><td colspan="5">加载中...</td></tr>
+    <tr><td colspan="6">加载中...</td></tr>
     </tbody>
 </table>
 
 <script>
     window.onload = async function(){
-        // 校验是不是管理员
         let role = localStorage.getItem("role");
         if(role !== "admin"){
             alert("无权限访问");
@@ -88,7 +111,7 @@
         let tbody = document.getElementById("userBody");
 
         if(!result.data || result.data.length === 0){
-            tbody.innerHTML = "<tr><td colspan='5'>暂无用户数据</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='6'>暂无用户数据</td></tr>";
             return;
         }
 
@@ -101,9 +124,37 @@
             <td>${u.phone || '未填写'}</td>
             <td>${new Date(u.createTime).toLocaleString()}</td>
             <td>${u.password}</td>
+            <td>
+                ${
+                u.username === 'admin'
+                    ? '<span class="admin-text">管理员</span>'
+                    : `<button class="del-btn" onclick="deleteUser(${u.id})">删除账号</button>`
+            }
+                <button class="reset-btn" onclick="resetPwd(${u.id})">重置密码</button>
+            </td>
         </tr>
         `;
         })
+    }
+
+    // 删除用户
+    async function deleteUser(userId) {
+        if (!confirm("确定要删除该用户吗？")) return;
+        let res = await fetch(`http://localhost:8080/admin/user/delete?userId=${userId}`, {
+            method: "POST"
+        });
+        alert("删除成功！");
+        loadUser();
+    }
+
+    // 重置密码为 123456
+    async function resetPwd(userId) {
+        if (!confirm("确定将密码重置为 123456 吗？")) return;
+        let res = await fetch(`http://localhost:8080/admin/user/resetPwd?userId=${userId}`, {
+            method: "POST"
+        });
+        alert("密码已重置为 123456！");
+        loadUser();
     }
 </script>
 
