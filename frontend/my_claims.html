@@ -52,6 +52,16 @@
             color: #333;
             font-size: 15px;
         }
+        /* 撤销按钮样式 */
+        .cancel-btn {
+            margin-top: 12px;
+            background: #f56c6c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
         .no-data {
             text-align: center;
             color: #999;
@@ -98,25 +108,40 @@
             }
 
             box.innerHTML = "";
-            // 用 for...of 循环，方便 await 异步获取物品信息
             for (let claim of result.data) {
                 let itemId = claim.itemId;
-                // 调用物品详情接口，获取物品名称
                 let itemRes = await fetch("http://localhost:8080/item/" + itemId);
                 let itemResult = await itemRes.json();
                 let item = itemResult.data;
 
+                // 撤销认领按钮
                 box.innerHTML += `
                 <div class="claim-item">
                     <p>物品：${item.name}</p>
                     <p>地点：${item.place || '未知'}</p>
                     <p>认领说明：${claim.message || '无'}</p>
+                    <button class="cancel-btn" onclick="cancelClaim(${claim.id})">撤销认领</button>
                 </div>
                 `;
             }
         } catch (e) {
             document.getElementById("claimList").innerHTML = `<div class="no-data">暂无认领记录</div>`;
         }
+    }
+
+    // 撤销认领函数
+    async function cancelClaim(claimId) {
+        if (!confirm("确定要撤销认领吗？")) return;
+
+        let res = await fetch("http://localhost:8080/claim/cancel/" + claimId, {
+            method: "DELETE"
+        });
+        let result = await res.json();
+        alert(result.message);
+
+        // 刷新列表
+        let userId = localStorage.getItem("userId");
+        loadMyClaims(userId);
     }
 
     function goBack() {

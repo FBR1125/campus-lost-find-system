@@ -55,4 +55,8 @@ public interface ItemMapper {
     // 认领物品：将 status 设为 1（已认领）
     @Update("UPDATE item SET status = 1 WHERE id = #{id}")
     int updateStatusToClaimed(@Param("id") Integer id);
+
+    // 加在你的 ItemMapper 接口里
+    @Update("UPDATE item SET status = #{status} WHERE id = #{id}")
+    void updateStatus(@Param("id") Integer id, @Param("status") Integer status);
 }
