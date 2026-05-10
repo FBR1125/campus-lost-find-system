@@ -56,7 +56,7 @@ public interface ItemMapper {
     @Update("UPDATE item SET status = 1 WHERE id = #{id}")
     int updateStatusToClaimed(@Param("id") Integer id);
 
-    // 加在你的 ItemMapper 接口里
+
     @Update("UPDATE item SET status = #{status} WHERE id = #{id}")
     void updateStatus(@Param("id") Integer id, @Param("status") Integer status);
 }
