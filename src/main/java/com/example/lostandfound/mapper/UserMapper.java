@@ -1,5 +1,7 @@
 package com.example.lostandfound.mapper;
 
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
 import com.example.lostandfound.entity.User;
@@ -67,5 +69,12 @@ public interface UserMapper {
     // 统计用户【已找回】物品数
     @Select("SELECT COUNT(*) FROM item WHERE user_id = #{userId} AND status = 1")
     int countUserFoundItems(@Param("userId") Integer userId);
+
+    //管理员用户管理
+    @Select("SELECT id, username, phone, password, create_time FROM user ORDER BY create_time DESC")
+    @Results({
+            @Result(property = "createTime", column = "create_time")
+    })
+    List<User> selectAllUser();
 
 }

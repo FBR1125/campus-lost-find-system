@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>用户管理列表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f5f7fa;
+            font-family: "Microsoft YaHei", sans-serif;
+            padding: 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        .back-btn {
+            background: #409eff;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th,td {
+            border: 1px solid #eee;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background: #f0f4f9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h2>用户管理列表</h2>
+    <button class="back-btn" onclick="history.back()">返回管理员中心</button>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>用户ID</th>
+        <th>用户名</th>
+        <th>手机号</th>
+        <th>注册时间</th>
+        <th>登录密码</th>
+    </tr>
+    </thead>
+    <tbody id="userBody">
+    <tr><td colspan="5">加载中...</td></tr>
+    </tbody>
+</table>
+
+<script>
+    window.onload = async function(){
+        // 校验是不是管理员
+        let role = localStorage.getItem("role");
+        if(role !== "admin"){
+            alert("无权限访问");
+            location.href = "index.html";
+            return;
+        }
+        loadUser();
+    }
+
+    async function loadUser(){
+        let res = await fetch("http://localhost:8080/admin/user/list");
+        let result = await res.json();
+        let tbody = document.getElementById("userBody");
+
+        if(!result.data || result.data.length === 0){
+            tbody.innerHTML = "<tr><td colspan='5'>暂无用户数据</td></tr>";
+            return;
+        }
+
+        tbody.innerHTML = "";
+        result.data.forEach(u=>{
+            tbody.innerHTML += `
+        <tr>
+            <td>${u.id}</td>
+            <td>${u.username}</td>
+            <td>${u.phone || '未填写'}</td>
+            <td>${new Date(u.createTime).toLocaleString()}</td>
+            <td>${u.password}</td>
+        </tr>
+        `;
+        })
+    }
+</script>
+
+</body>
+</html>
