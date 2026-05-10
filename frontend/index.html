@@ -290,7 +290,13 @@
 
     // 点击认领 → 弹出联系方式
     async function showContact(itemId) {
-        // 1. 获取并显示联系方式
+        // 1. 判断用户是不是管理员
+        let role = localStorage.getItem("role");
+        if (role === "admin") {
+            alert("管理员账号无法发起认领，请使用普通用户账号操作！");
+            return;
+        }
+        // 2. 获取并显示联系方式
         let res = await fetch("http://localhost:8080/item/" + itemId);
         let result = await res.json();
         if (result.code !== 200) {
@@ -300,7 +306,7 @@
         let item = result.data;
         alert("联系方式：" + (item.contact || "未填写"));
 
-        // 2. 调用后端，更新物品状态为已认领，并插入认领记录
+        // 3. 调用后端，更新物品状态为已认领，并插入认领记录
         let userId = parseInt(localStorage.getItem("userId"));
         let claimRes = await fetch("http://localhost:8080/user/claim", {
             method: "POST",
