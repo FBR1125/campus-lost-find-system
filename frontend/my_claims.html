@@ -52,16 +52,6 @@
             color: #333;
             font-size: 15px;
         }
-        .status {
-            font-size: 13px;
-            padding: 3px 8px;
-            border-radius: 4px;
-            display: inline-block;
-            margin-top: 5px;
-        }
-        .status0 { background: #fff7e6; color: #faad14; }
-        .status1 { background: #e6ffed; color: #52c41a; }
-        .status2 { background: #fff2f0; color: #f5222d; }
         .no-data {
             text-align: center;
             color: #999;
@@ -108,30 +98,22 @@
             }
 
             box.innerHTML = "";
-            result.data.forEach(claim => {
-                let statusText = "";
-                let statusClass = "";
-
-                if (claim.status === 0) {
-                    statusText = "待审核";
-                    statusClass = "status0";
-                } else if (claim.status === 1) {
-                    statusText = "已通过";
-                    statusClass = "status1";
-                } else {
-                    statusText = "已拒绝";
-                    statusClass = "status2";
-                }
+            // 用 for...of 循环，方便 await 异步获取物品信息
+            for (let claim of result.data) {
+                let itemId = claim.itemId;
+                // 调用物品详情接口，获取物品名称
+                let itemRes = await fetch("http://localhost:8080/item/" + itemId);
+                let itemResult = await itemRes.json();
+                let item = itemResult.data;
 
                 box.innerHTML += `
                 <div class="claim-item">
-                    <p>物品ID：${claim.itemId}</p>
-                    <p>认领说明：${claim.description || '无'}</p>
-                    <p>联系方式：${claim.contact || '未填写'}</p>
-                    <span class="status ${statusClass}">${statusText}</span>
+                    <p>物品：${item.name}</p>
+                    <p>地点：${item.place || '未知'}</p>
+                    <p>认领说明：${claim.message || '无'}</p>
                 </div>
                 `;
-            });
+            }
         } catch (e) {
             document.getElementById("claimList").innerHTML = `<div class="no-data">暂无认领记录</div>`;
         }

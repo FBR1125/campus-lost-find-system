@@ -41,7 +41,7 @@ public interface UserMapper {
     List<Item> myItems(@Param("userId") Integer userId);
 
     // 个人中心：我的认领
-    @Select("SELECT * FROM claim WHERE user_id = #{userId} ORDER BY create_time DESC")
+    @Select("SELECT id, item_id AS itemId, user_id, message, status, create_time FROM claim WHERE user_id = #{userId} ORDER BY create_time DESC")
     List<Claim> myClaims(@Param("userId") Integer userId);
 
     // 统计总用户数
