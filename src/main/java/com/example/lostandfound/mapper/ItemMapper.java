@@ -47,4 +47,12 @@ public interface ItemMapper {
     // 统计已审核通过的物品数（check_status=1）
     @Select("SELECT COUNT(*) FROM item WHERE check_status = 1")
     int countApprovedItems();
+
+    // 根据ID查询物品
+    @Select("SELECT * FROM item WHERE id = #{id}")
+    Item findById(Integer id);
+
+    // 认领物品：将 status 设为 1（已认领）
+    @Update("UPDATE item SET status = 1 WHERE id = #{id}")
+    int updateStatusToClaimed(@Param("id") Integer id);
 }

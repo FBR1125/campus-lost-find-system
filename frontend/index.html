@@ -135,6 +135,18 @@
             font-size: 12px;
         }
 
+        /* 认领按钮样式 */
+        .claim-btn {
+            background: #409eff;
+            color: #fff;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
         .no-data {
             text-align: center;
             color: #999;
@@ -161,6 +173,11 @@
         }
         .nav-item.active {
             color: #409eff;
+        }
+
+        .claim-btn.claimed {
+            background: #67c23a;
+            cursor: default;
         }
     </style>
 </head>
@@ -197,10 +214,9 @@
 <script>
     window.onload = function () {
         checkLogin();
-        loadHomeList(); // 自动加载已审核的最新物品
+        loadHomeList();
     };
 
-    // 自动加载首页列表（已审核）
     async function loadHomeList() {
         let res = await fetch("http://localhost:8080/item/home");
         let result = await res.json();
@@ -239,6 +255,7 @@
         document.getElementById("list-title").innerText = keyword ? `"${keyword}" 搜索结果` : "最新失物信息";
     }
 
+    // 渲染物品 + 认领按钮
     function renderItems(items) {
         let list = document.getElementById("item-list");
         list.innerHTML = "";
@@ -249,20 +266,65 @@
         items.forEach(item => {
             let tagClass = item.type === 0 ? "tag-lost" : "tag-found";
             let tagText = item.type === 0 ? "失物" : "招领";
+
+            // 认领按钮：已认领则禁用并显示已认领，未认领则正常
+            let claimBtn = "";
+            if (item.type === 1) { // 只有招领物品才有认领按钮
+                if (item.status === 1) {
+                    claimBtn = `<button class="claim-btn claimed" disabled>已认领√</button>`;
+                } else {
+                    claimBtn = `<button class="claim-btn" onclick="showContact(${item.id})">认领</button>`;
+                }
+            }
+
             list.innerHTML += `
         <div class="item-card">
             <h3>${item.name}</h3>
             <p>地点：${item.place||'未知'}</p>
             <p>描述：${item.description||'无'}</p>
             <span class="${tagClass}">${tagText}</span>
+            ${claimBtn}
         </div>`;
         });
     }
 
-    function login() { location.href = "user_login.html"; }
-    function register(){
-        location.href = "register.html";
+    // 点击认领 → 弹出联系方式
+    async function showContact(itemId) {
+        // 1. 获取并显示联系方式
+        let res = await fetch("http://localhost:8080/item/" + itemId);
+        let result = await res.json();
+        if (result.code !== 200) {
+            alert("获取失败");
+            return;
+        }
+        let item = result.data;
+        alert("联系方式：" + (item.contact || "未填写"));
+
+        // 2. 调用后端，更新物品状态为已认领，并插入认领记录
+        let userId = parseInt(localStorage.getItem("userId"));
+        let claimRes = await fetch("http://localhost:8080/user/claim", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                itemId: itemId,
+                userId: userId,
+                message: "认领该物品"
+            })
+        });
+        let claimResult = await claimRes.json();
+        if (claimResult.code === 200) {
+            alert("认领成功！");
+            // 刷新列表
+            loadHomeList();
+        } else {
+            alert("认领失败：" + claimResult.message);
+        }
     }
+
+    function login() { location.href = "user_login.html"; }
+    function register(){ location.href = "register.html"; }
     function goIndex() { location.href = "index.html"; }
     function goPublish() { location.href = "publish.html"; }
 </script>

@@ -79,4 +79,21 @@ public class ItemController {
     public Result<List<Item>> pending() {
         return Result.success("获取成功", itemService.getPendingItems());
     }
+
+    // 根据ID查询物品（认领功能）
+    @GetMapping("/{id}")
+    public Result<Item> getById(@PathVariable Integer id) {
+        return Result.success("获取成功", itemService.getById(id));
+    }
+
+    // 认领物品（修改状态为已认领）
+    @PostMapping("/claim/{id}")
+    public Result<?> claimItem(@PathVariable Integer id) {
+        int i = itemService.claimItem(id);
+        if (i > 0) {
+            return Result.success("认领成功");
+        } else {
+            return Result.error("认领失败");
+        }
+    }
 }

@@ -69,9 +69,10 @@ public class UserService {
     }
 
     // 认领申请
-    public Result<Claim> applyClaim(Claim claim) {
+    public Result<Claim> claimItem(Claim claim) {
         int i = userMapper.applyClaim(claim);
-        return i > 0 ? Result.success("申请成功", claim) : Result.error("申请失败");
+        userMapper.updateItemStatus(claim.getItemId());
+        return i > 0 ? Result.success("认领成功", claim) : Result.error("认领失败");
     }
 
     // 我的发布
@@ -98,5 +99,10 @@ public class UserService {
     // 为发布页面校验获取id
     public User getById(Integer id) {
         return userMapper.selectById(id);
+    }
+
+    // 获取用户已找回物品数量
+    public int countFoundItems(Integer userId) {
+        return userMapper.countUserFoundItems(userId);
     }
 }

@@ -42,4 +42,13 @@ public class ItemService {
     public List<Item> getPendingItems() {
         return itemMapper.findPendingItems();
     }
+
+    // 根据ID查询物品
+    public Item getById(Integer id) {
+        return itemMapper.findById(id);
+    }
+
+    public int claimItem(Integer id) {
+        return itemMapper.updateStatusToClaimed(id);
+    }
 }

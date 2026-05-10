@@ -282,6 +282,7 @@
 
         loadMyItems(userId);
         loadMyClaims(userId);
+        loadFoundCount(userId);
     }
 
     async function loadMyItems(userId){
@@ -300,6 +301,15 @@
         }
     }
 
+    // 加载已找回物品数量
+    async function loadFoundCount(userId) {
+        let res = await fetch("http://localhost:8080/user/stats?userId=" + userId);
+        let result = await res.json();
+        if (result.code === 200) {
+            document.getElementById("foundCount").innerText = result.data.foundCount;
+        }
+    }
+
     function goHome() {
         location.href = "index.html";
     }
@@ -310,7 +320,7 @@
         location.href = "index.html";
     }
 
-    // 跳转发布
+    /// 跳转发布
     function goPublish() {
         let role = localStorage.getItem("role");
         if(role === 'user'){
@@ -320,32 +330,32 @@
         }
     }
 
-    async function modifyPwd(){
+    async function modifyPwd() {
         let userId = localStorage.getItem("userId");
         let oldPwd = document.getElementById("oldPwd").value.trim();
         let newPwd = document.getElementById("newPwd").value.trim();
         let rePwd = document.getElementById("rePwd").value.trim();
 
-        if(!oldPwd || !newPwd || !rePwd){
+        if (!oldPwd || !newPwd || !rePwd) {
             alert("请填写完整！");
             return;
         }
 
-        let res = await fetch("http://localhost:8080/user/updatePwd",{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
+        let res = await fetch("http://localhost:8080/user/updatePwd", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
             },
-            body:JSON.stringify({
-                userId:userId,
-                oldPwd:oldPwd,
-                newPwd:newPwd,
-                rePwd:rePwd
+            body: JSON.stringify({
+                userId: userId,
+                oldPwd: oldPwd,
+                newPwd: newPwd,
+                rePwd: rePwd
             })
         });
         let result = await res.json();
         alert(result.message);
-        if(result.code === 200){
+        if (result.code === 200) {
             localStorage.clear();
             location.href = "user_login.html";
         }

@@ -1,6 +1,7 @@
 package com.example.lostandfound.controller;
 
 import java.util.Map;
+import java.util.HashMap;
 import com.example.lostandfound.common.Result;
 import com.example.lostandfound.entity.User;
 import com.example.lostandfound.entity.Item;
@@ -56,7 +57,7 @@ public class UserController {
     // 申请认领
     @PostMapping("/claim")
     public Result claim(@RequestBody Claim claim){
-        return userService.applyClaim(claim);
+        return userService.claimItem(claim);
     }
 
     // 个人中心：我的发布
@@ -95,5 +96,15 @@ public class UserController {
         }else{
             return Result.error("原密码错误");
         }
+    }
+
+    // 用户个人中心统计数据
+    @GetMapping("/stats")
+    public Result<Map<String, Object>> getUserStats(@RequestParam Integer userId) {
+        Map<String, Object> map = new HashMap<>();
+        // 已找回数量
+        int foundCount = userService.countFoundItems(userId);
+        map.put("foundCount", foundCount);
+        return Result.success("获取成功", map);
     }
 }

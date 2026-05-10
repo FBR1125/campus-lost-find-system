@@ -60,4 +60,12 @@ public interface UserMapper {
     @Update("update user set password = #{newPwd} where id = #{id}")
     int updatePwd(@Param("id") Integer id, @Param("newPwd") String newPwd);
 
+    // 认领物品 → 更新 status = 1
+    @Update("UPDATE item SET status = 1 WHERE id = #{itemId}")
+    int updateItemStatus(@Param("itemId") Integer itemId);
+
+    // 统计用户【已找回】物品数
+    @Select("SELECT COUNT(*) FROM item WHERE user_id = #{userId} AND status = 1")
+    int countUserFoundItems(@Param("userId") Integer userId);
+
 }
