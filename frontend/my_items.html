@@ -80,7 +80,17 @@
         result.data.forEach(item => {
             let typeName = item.type === 0 ? "失物" : "招领";
             let typeClass = item.type === 0 ? "lost" : "found";
-            let checkInfo = item.check_status === 0 ? "待审核" : "已通过";
+
+            let val = item.checkStatus || item.checkstatus || item.check_status || 0;
+            let checkInfo = "";
+
+            if(val == 0){
+                checkInfo = "待审核";
+            }else if(val == 1){
+                checkInfo = "已通过";
+            }else if(val == 2){
+                checkInfo = "已驳回";
+            }
 
             box.innerHTML += `
             <div class="item">

@@ -37,7 +37,7 @@ public interface UserMapper {
     int applyClaim(Claim claim);
 
     // 个人中心：我的发布
-    @Select("SELECT * FROM item WHERE user_id = #{userId} ORDER BY create_time DESC")
+    @Select("SELECT id, user_id, name, place, description, contact, type, status, create_time, check_status AS checkStatus FROM item WHERE user_id = #{userId} ORDER BY create_time DESC")
     List<Item> myItems(@Param("userId") Integer userId);
 
     // 个人中心：我的认领
