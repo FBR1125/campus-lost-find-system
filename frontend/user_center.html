@@ -71,6 +71,8 @@
             color: white;
             font-size: 30px;
             font-weight: bold;
+            background-size: cover;
+            background-position: center;
         }
 
         .info-detail h3 {
@@ -213,7 +215,7 @@
 
     <!-- 个人信息 -->
     <div class="profile-card">
-        <div class="avatar">用</div>
+        <div class="avatar" id="mainAvatar">用</div>
         <div class="info-detail">
             <h3>用户名：student</h3>
             <p>账号类型：普通用户</p>
@@ -268,6 +270,19 @@
 </div>
 
 <script>
+    // 头像加载
+    function loadAvatar() {
+        let avatar = localStorage.getItem("avatar");
+        let username = localStorage.getItem("username");
+        let dom = document.getElementById("mainAvatar");
+        if (avatar) {
+            dom.style.backgroundImage = `url(${avatar})`;
+            dom.innerText = "";
+        } else {
+            dom.innerText = username.charAt(0).toUpperCase();
+        }
+    }
+
     window.onload = function(){
         let userId = localStorage.getItem("userId");
         let username = localStorage.getItem("username");
@@ -280,6 +295,8 @@
 
         document.querySelector(".info-detail h3").innerText = "用户名：" + username;
         document.querySelector(".user-info").innerText = "欢迎你，" + username;
+
+        loadAvatar(); // 加载头像
 
         loadMyItems(userId);
         loadMyClaims(userId);
@@ -302,7 +319,6 @@
         }
     }
 
-    // 加载已找回物品数量
     async function loadFoundCount(userId) {
         let res = await fetch("http://localhost:8080/user/stats?userId=" + userId);
         let result = await res.json();
@@ -316,12 +332,16 @@
     }
 
     function logout() {
-        localStorage.clear();
+        // 只清除登录信息，不清除头像
+        localStorage.removeItem("userId");
+        localStorage.removeItem("username");
+        localStorage.removeItem("role");
+        localStorage.removeItem("isLogin");
+
         alert("退出成功！");
         location.href = "index.html";
     }
 
-    /// 跳转发布
     function goPublish() {
         let role = localStorage.getItem("role");
         if(role === 'user'){

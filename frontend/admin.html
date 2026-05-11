@@ -33,6 +33,21 @@
 
         .user-info {
             font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #fff;
+            color: #409eff;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            background-size: cover;
+            background-position: center;
         }
 
         /* 内容面板 */
@@ -121,7 +136,10 @@
 <!-- 顶部导航 -->
 <div class="header">
     <h1>校园失物招领管理系统</h1>
-    <div class="user-info">欢迎你，管理员：admin</div>
+    <div class="user-info">
+        <div class="admin-avatar" id="adminAvatar"></div>
+        欢迎你，管理员：<span id="adminName">admin</span>
+    </div>
 </div>
 
 <!-- 内容区 -->
@@ -180,27 +198,35 @@
 </div>
 
 <script>
+    function loadAdminAvatar() {
+        let avatar = localStorage.getItem("avatar");
+        let username = localStorage.getItem("username");
+        let dom = document.getElementById("adminAvatar");
+        if (avatar) {
+            dom.style.backgroundImage = `url(${avatar})`;
+            dom.innerText = "";
+        } else {
+            dom.innerText = username.charAt(0).toUpperCase();
+        }
+    }
+
     window.onload = function(){
         let role = localStorage.getItem("role");
         let username = localStorage.getItem("username");
 
-        //是否为管理员
         if(role !== "admin"){
             alert("无权限！");
             location.href = "index.html";
             return;
         }
 
-        //动态更新管理员用户名
-        document.querySelector(".user-info").innerText = "欢迎你，管理员：" + username;
+        document.getElementById("adminName").innerText = username;
+        loadAdminAvatar();
 
-        // 加载统计数字
         loadAdminStats();
     }
 
-    // 加载管理员统计数据
     async function loadAdminStats(){
-        // 用户总数
         let res = await fetch("http://localhost:8080/api/admin/stats");
         let result = await res.json();
         if (result.code === 200) {
@@ -212,37 +238,34 @@
         }
     }
 
-    // 跳转到发布审核页面
     function goCheck() {
         location.href = "check.html";
     }
-
-    // 返回主页
     function goHome() {
         location.href = "index.html";
     }
-
-    // 退出登录
     function logout() {
-        localStorage.clear();
+        // 只清除登录信息，不清除头像
+        localStorage.removeItem("userId");
+        localStorage.removeItem("username");
+        localStorage.removeItem("role");
+        localStorage.removeItem("isLogin");
+
         alert("退出成功！");
         location.href = "index.html";
     }
 
-    // 管理员修改密码
     async function adminModifyPwd(){
         let userId = localStorage.getItem("userId");
         let oldPwd = document.getElementById("adminOldPwd").value.trim();
         let newPwd = document.getElementById("adminNewPwd").value.trim();
         let rePwd = document.getElementById("adminRePwd").value.trim();
 
-        // 非空校验
         if(!oldPwd || !newPwd || !rePwd){
             alert("请填写完整！");
             return;
         }
 
-        // 调用统一的修改密码接口
         let res = await fetch("http://localhost:8080/user/updatePwd",{
             method:"POST",
             headers:{
@@ -257,7 +280,6 @@
         });
         let result = await res.json();
         alert(result.message);
-        // 修改成功清空登录状态，跳转到管理员登录页
         if(result.code === 200){
             localStorage.clear();
             location.href = "admin_login.html";

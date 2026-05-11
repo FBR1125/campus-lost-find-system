@@ -62,6 +62,8 @@
             text-align: center;
             line-height: 36px;
             font-weight: bold;
+            background-size: cover;
+            background-position: center;
         }
 
         .search-section {
@@ -135,7 +137,6 @@
             font-size: 12px;
         }
 
-        /* 认领按钮样式 */
         .claim-btn {
             background: #409eff;
             color: #fff;
@@ -226,12 +227,20 @@
     function checkLogin() {
         let isLogin = localStorage.getItem("isLogin");
         let username = localStorage.getItem("username");
+        let avatar = localStorage.getItem("avatar");
         let headerRight = document.getElementById("headerRight");
 
         if (isLogin === "true") {
+            let avatarHtml = '';
+            if (avatar) {
+                avatarHtml = `<div class="avatar-img" style="background-image:url(${avatar})"></div>`;
+            } else {
+                avatarHtml = `<div class="avatar-img">${username.charAt(0)}</div>`;
+            }
+
             headerRight.innerHTML = `
             <div class="user-avatar" onclick="goPersonal()">
-                <div class="avatar-img">${username.charAt(0)}</div>
+                ${avatarHtml}
                 <span>${username}</span>
             </div>
         `;
@@ -249,22 +258,17 @@
 
     async function searchItem() {
         let keyword = document.getElementById("keyword").value.trim();
-
-        // 空内容 → 加载全部
         if (!keyword) {
             loadHomeList();
             document.getElementById("list-title").innerText = "最新失物信息";
             return;
         }
-
-        // 有内容 → 搜索物品
         let res = await fetch("http://localhost:8080/item/search?keyword=" + encodeURIComponent(keyword));
         let result = await res.json();
         renderItems(result.data);
         document.getElementById("list-title").innerText = `"${keyword}" 搜索结果`;
     }
 
-    // 渲染物品 + 认领按钮
     function renderItems(items) {
         let list = document.getElementById("item-list");
         list.innerHTML = "";
@@ -275,17 +279,14 @@
         items.forEach(item => {
             let tagClass = item.type === 0 ? "tag-lost" : "tag-found";
             let tagText = item.type === 0 ? "失物" : "招领";
-
-            // 认领按钮：已认领则禁用并显示已认领，未认领则正常
             let claimBtn = "";
-            if (item.type === 1) { // 只有招领物品才有认领按钮
+            if (item.type === 1) {
                 if (item.status === 1) {
                     claimBtn = `<button class="claim-btn claimed" disabled>已认领√</button>`;
                 } else {
                     claimBtn = `<button class="claim-btn" onclick="showContact(${item.id})">认领</button>`;
                 }
             }
-
             list.innerHTML += `
         <div class="item-card">
             <h3>${item.name}</h3>
@@ -297,15 +298,12 @@
         });
     }
 
-    // 点击认领 → 弹出联系方式
     async function showContact(itemId) {
-        // 1. 判断用户是不是管理员
         let role = localStorage.getItem("role");
         if (role === "admin") {
             alert("管理员账号无法发起认领，请使用普通用户账号操作！");
             return;
         }
-        // 2. 获取并显示联系方式
         let res = await fetch("http://localhost:8080/item/" + itemId);
         let result = await res.json();
         if (result.code !== 200) {
@@ -315,7 +313,6 @@
         let item = result.data;
         alert("联系方式：" + (item.contact || "未填写"));
 
-        // 3. 调用后端，更新物品状态为已认领，并插入认领记录
         let userId = parseInt(localStorage.getItem("userId"));
         let claimRes = await fetch("http://localhost:8080/user/claim", {
             method: "POST",
@@ -331,7 +328,6 @@
         let claimResult = await claimRes.json();
         if (claimResult.code === 200) {
             alert("认领成功！");
-            // 刷新列表
             loadHomeList();
         } else {
             alert("认领失败：" + claimResult.message);
