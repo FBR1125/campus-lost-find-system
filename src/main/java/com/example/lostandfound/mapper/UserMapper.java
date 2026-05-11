@@ -93,4 +93,8 @@ public interface UserMapper {
                         @Param("username") String username,
                         @Param("phone") String phone);
 
+    // 删除用户
+    @Delete("DELETE FROM user WHERE id = #{id}")
+    void deleteUserById(@Param("id") Integer id);
+
 }

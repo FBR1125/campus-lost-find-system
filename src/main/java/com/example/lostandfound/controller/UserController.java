@@ -122,4 +122,21 @@ public class UserController {
         return Result.success("修改成功");
     }
 
+    //
+    @PostMapping("/deleteAccount")
+    public Result deleteAccount(@RequestBody User user) {
+        // 先查原密码
+        User dbUser = userMapper.selectById(user.getId());
+        if (dbUser == null) {
+            return Result.error("用户不存在");
+        }
+        // 校验密码
+        if (!dbUser.getPassword().equals(user.getPassword())) {
+            return Result.error("密码错误");
+        }
+        // 删除用户
+        userMapper.deleteUserById(user.getId());
+        return Result.success("注销成功");
+    }
+
 }

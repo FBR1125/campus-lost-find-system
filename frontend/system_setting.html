@@ -194,8 +194,26 @@
     </div>
 </div>
 
+<!-- 注销账户 弹窗 -->
+<div class="modal" id="deleteModal">
+    <div class="modal-content">
+        <div class="modal-title">注销账户</div>
+        <div style="color:#f56c6c; font-size:12px; margin-bottom:15px;">
+            ⚠️ 注销后账户将永久删除，无法恢复！
+        </div>
+        <div class="form-item">
+            <label>请输入登录密码确认注销</label>
+            <input id="delete_pwd" type="password" placeholder="请输入密码">
+        </div>
+        <div class="modal-btns">
+            <button class="btn close-btn" onclick="closeDeleteModal()">取消</button>
+            <button class="btn danger" onclick="confirmDelete()">确认注销</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    let originalUsername = ""; // 保存原来的用户名，用于校验
+    let originalUsername = "";
 
     window.onload = function () {
         let userId = localStorage.getItem("userId");
@@ -218,12 +236,12 @@
         } else {
             deleteItem.innerHTML = `
                 <span>注销账户</span>
-                <button class="btn danger" onclick="alert('注销功能开发中')">注销账户</button>
+                <button class="btn danger" onclick="openDeleteModal()">注销账户</button>
             `;
         }
     };
 
-    // 打开弹窗
+    // 打开修改弹窗
     function openEditModal() {
         document.getElementById("edit_id").value = localStorage.getItem("userId");
         document.getElementById("edit_username").value = localStorage.getItem("username");
@@ -231,7 +249,6 @@
         document.getElementById("editModal").style.display = "flex";
     }
 
-    // 关闭弹窗
     function closeModal() {
         document.getElementById("editModal").style.display = "none";
     }
@@ -246,8 +263,6 @@
             alert("用户名不能为空");
             return;
         }
-
-        // 不能和原来名字一样
         if (username === originalUsername) {
             alert("新用户名不能和原来一样！");
             return;
@@ -271,6 +286,44 @@
             location.reload();
         } else {
             alert("修改失败：" + result.data);
+        }
+    }
+
+    // 注销账户相关
+    function openDeleteModal() {
+        document.getElementById("delete_pwd").value = "";
+        document.getElementById("deleteModal").style.display = "flex";
+    }
+
+    function closeDeleteModal() {
+        document.getElementById("deleteModal").style.display = "none";
+    }
+
+    async function confirmDelete() {
+        let pwd = document.getElementById("delete_pwd").value.trim();
+        let userId = localStorage.getItem("userId");
+
+        if (!pwd) {
+            alert("请输入密码！");
+            return;
+        }
+
+        let res = await fetch("http://localhost:8080/user/deleteAccount", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                id: parseInt(userId),
+                password: pwd
+            })
+        });
+
+        let result = await res.json();
+        if (result.code === 200) {
+            alert("账号已成功注销！");
+            localStorage.clear();
+            location.href = "user_login.html";
+        } else {
+            alert("注销失败：" + result.data);
         }
     }
 
