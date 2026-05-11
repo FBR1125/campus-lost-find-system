@@ -19,7 +19,6 @@ public class UserController {
     @Resource
     UserService userService;
 
-    //
     @Autowired
     private UserMapper userMapper;
 
@@ -39,6 +38,15 @@ public class UserController {
     @GetMapping("/findPassword")
     public Result findPwd(String username,String phone){
         return userService.findPassword(username,phone);
+    }
+
+    // 头像更新接口
+    @PostMapping("/updateAvatar")
+    public Result updateAvatar(@RequestBody Map<String, String> map) {
+        Integer userId = Integer.parseInt(map.get("id"));
+        String avatar = map.get("avatar");
+        boolean ok = userService.updateAvatar(userId, avatar);
+        return ok ? Result.success("头像更新成功") : Result.error("头像更新失败");
     }
 
     // 发布失物
@@ -79,20 +87,16 @@ public class UserController {
         return Result.success(userService.getMyClaims(userId));
     }
 
-
     @PostMapping("/updatePwd")
     public Result updatePwd(@RequestBody Map<String,String> map){
-        // 从localStorage存的userId拿
         Integer userId = Integer.parseInt(map.get("userId"));
         String oldPwd = map.get("oldPwd");
         String newPwd = map.get("newPwd");
         String rePwd = map.get("rePwd");
 
-        // 非空
         if(oldPwd==null || newPwd==null || rePwd==null){
             return Result.error("不能为空");
         }
-        // 两次新密码一致
         if(!newPwd.equals(rePwd)){
             return Result.error("两次新密码不一致");
         }
@@ -105,36 +109,29 @@ public class UserController {
         }
     }
 
-    // 用户个人中心统计数据
     @GetMapping("/stats")
     public Result<Map<String, Object>> getUserStats(@RequestParam Integer userId) {
         Map<String, Object> map = new HashMap<>();
-        // 已找回数量
         int foundCount = userService.countFoundItems(userId);
         map.put("foundCount", foundCount);
         return Result.success("获取成功", map);
     }
 
-    //
     @PostMapping("/updateInfo")
     public Result updateInfo(@RequestBody User user) {
         userMapper.updateUserInfo(user.getId(), user.getUsername(), user.getPhone());
         return Result.success("修改成功");
     }
 
-    //
     @PostMapping("/deleteAccount")
     public Result deleteAccount(@RequestBody User user) {
-        // 先查原密码
         User dbUser = userMapper.selectById(user.getId());
         if (dbUser == null) {
             return Result.error("用户不存在");
         }
-        // 校验密码
         if (!dbUser.getPassword().equals(user.getPassword())) {
             return Result.error("密码错误");
         }
-        // 删除用户
         userMapper.deleteUserById(user.getId());
         return Result.success("注销成功");
     }

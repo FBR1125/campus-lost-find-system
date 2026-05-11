@@ -96,6 +96,12 @@
             localStorage.setItem("role", user.role);
             localStorage.setItem("username", user.username);
             localStorage.setItem("userId", user.id);
+
+            // 加载头像
+            if (user.avatar) {
+                localStorage.setItem("avatar", user.avatar);
+            }
+
             location.href = "index.html";
         } else {
             msg.innerText = result.message;

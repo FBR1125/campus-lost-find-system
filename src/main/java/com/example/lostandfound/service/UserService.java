@@ -17,19 +17,14 @@ public class UserService {
 
     // 注册
     public Result<User> register(User user) {
-        // 1. 校验 账号(id) 是否重复
         User existId = userMapper.selectById(user.getId());
         if (existId != null) {
             return Result.error("账号已存在！");
         }
-
-        // 2. 校验 用户名(username) 是否重复
         User existName = userMapper.selectByUsername(user.getUsername());
         if (existName != null) {
             return Result.error("用户名已存在！");
         }
-
-        // 3. 插入数据
         int i = userMapper.register(user);
         return i > 0 ? Result.success("注册成功", user) : Result.error("注册失败");
     }
@@ -54,6 +49,11 @@ public class UserService {
         } else {
             return Result.error("用户不存在");
         }
+    }
+
+    // 头像更新
+    public boolean updateAvatar(Integer userId, String avatar) {
+        return userMapper.updateAvatar(userId, avatar) > 0;
     }
 
     // 发布物品
@@ -87,21 +87,17 @@ public class UserService {
 
     // 改密码
     public boolean updatePassword(Integer userId, String oldPwd, String newPwd) {
-        // 1. 查原密码
         String dbPwd = userMapper.getPwdById(userId);
         if(!oldPwd.equals(dbPwd)){
             return false;
         }
-        // 2. 更新
         return userMapper.updatePwd(userId, newPwd) > 0;
     }
 
-    // 为发布页面校验获取id
     public User getById(Integer id) {
         return userMapper.selectById(id);
     }
 
-    // 获取用户已找回物品数量
     public int countFoundItems(Integer userId) {
         return userMapper.countUserFoundItems(userId);
     }

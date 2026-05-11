@@ -5,7 +5,6 @@ import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Update;
 import com.example.lostandfound.entity.User;
 import com.example.lostandfound.entity.Item;
 import com.example.lostandfound.entity.Claim;
@@ -27,6 +26,10 @@ public interface UserMapper {
     // 找回密码
     @Select("SELECT password FROM user WHERE username=#{username} AND phone=#{phone}")
     String findPassword(String username, String phone);
+
+    // 头像相关
+    @Update("UPDATE user SET avatar=#{avatar} WHERE id=#{id}")
+    int updateAvatar(@Param("id") Integer id, @Param("avatar") String avatar);
 
     // 发布物品
     @Insert("INSERT INTO item(user_id,name,description,type,status) VALUES(#{userId},#{name},#{description},#{type},0)")
@@ -87,13 +90,11 @@ public interface UserMapper {
     @Update("UPDATE user SET password = '123456' WHERE id = #{userId}")
     void resetPassword(Integer userId);
 
-    //
     @Update("UPDATE user SET username=#{username}, phone=#{phone} WHERE id=#{id}")
     void updateUserInfo(@Param("id") Integer id,
                         @Param("username") String username,
                         @Param("phone") String phone);
 
-    // 删除用户
     @Delete("DELETE FROM user WHERE id = #{id}")
     void deleteUserById(@Param("id") Integer id);
 

@@ -9,6 +9,7 @@ public class User {
     private String phone;
     private LocalDateTime createTime;
     private String role;
+    private String avatar;
 
     public User() {}
 
@@ -23,4 +24,8 @@ public class User {
     public void setPhone(String phone) { this.phone = phone; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+
+    // 头像 getter/setter
+    public String getAvatar() { return avatar; }
+    public void setAvatar(String avatar) { this.avatar = avatar; }
 }

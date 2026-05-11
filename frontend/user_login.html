@@ -103,6 +103,14 @@
             localStorage.setItem("role", user.role);
             localStorage.setItem("username", user.username);
             localStorage.setItem("userId", user.id);
+
+            // 加载当前账号头像
+            if (user.avatar) {
+                localStorage.setItem("avatar", user.avatar);
+            } else {
+                localStorage.removeItem("avatar");
+            }
+
             location.href = "index.html";
         } else {
             msg.innerText = result.message;

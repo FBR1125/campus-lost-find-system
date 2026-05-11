@@ -287,17 +287,30 @@
     });
 
     // 保存头像
-    function saveAvatar() {
+    async function saveAvatar() {
         let file = document.getElementById("avatarFile").files[0];
         if (!file) {
             alert("请选择图片！");
             return;
         }
         let reader = new FileReader();
-        reader.onload = function (e) {
+        reader.onload = async function (e) {
             let base64 = e.target.result;
+            // 存本地
             localStorage.setItem("avatar", base64);
             document.getElementById("avatarChar").style.backgroundImage = `url(${base64})`;
+
+            // 同步存到后端
+            let userId = localStorage.getItem("userId");
+            await fetch("http://localhost:8080/user/updateAvatar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: parseInt(userId),
+                    avatar: base64
+                })
+            });
+
             alert("头像修改成功！");
             closeAvatarModal();
         };
