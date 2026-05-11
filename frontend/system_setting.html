@@ -37,7 +37,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             text-align: center;
         }
-        /* 头像区域 */
         .avatar-area {
             margin-bottom: 25px;
         }
@@ -56,7 +55,6 @@
             font-weight: bold;
             color: #333;
         }
-        /* 设置项 */
         .setting-item {
             display: flex;
             justify-content: space-between;
@@ -91,9 +89,59 @@
             color: #999;
             font-size: 14px;
         }
+
+        /* 弹出模态框 */
+        .modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        .modal-content {
+            background: white;
+            width: 350px;
+            padding: 25px;
+            border-radius: 10px;
+        }
+        .modal-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-item {
+            margin-bottom: 15px;
+        }
+        .form-item label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .form-item input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-item input:disabled {
+            background: #f5f5f5;
+        }
+        .modal-btns {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .close-btn {
+            background: #999;
+        }
     </style>
 </head>
 <body>
+
 <div class="header">
     <h1>校园失物招领系统</h1>
     <span id="welcome"></span>
@@ -102,61 +150,135 @@
 <div class="container">
     <div class="page-title">系统设置</div>
     <div class="card">
-        <!-- 头像 + 昵称区域 -->
         <div class="avatar-area">
             <div class="avatar" id="avatarChar"></div>
             <div class="nickname" id="nickname"></div>
         </div>
 
-        <!-- 设置项 -->
         <div class="setting-item">
             <span>头像</span>
-            <button class="btn" onclick="alert('更换头像功能开发中...')">修改</button>
+            <button class="btn" onclick="alert('开发中...')">修改</button>
         </div>
         <div class="setting-item">
             <span>个人信息</span>
-            <button class="btn" onclick="alert('修改个人信息功能开发中...')">修改</button>
+            <button class="btn" onclick="openEditModal()">修改</button>
         </div>
-        <div class="setting-item" id="deleteItem">
-            <!-- 内容由JS动态生成 -->
-        </div>
+        <div class="setting-item" id="deleteItem"></div>
     </div>
 
     <button class="btn back-btn" onclick="goBack()">返回</button>
 </div>
 
+<!-- 修改个人信息 弹窗 -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <div class="modal-title">修改个人信息</div>
+
+        <div class="form-item">
+            <label>用户ID（不可修改）</label>
+            <input id="edit_id" disabled>
+        </div>
+        <div class="form-item">
+            <label>用户名</label>
+            <input id="edit_username">
+        </div>
+        <div class="form-item">
+            <label>手机号</label>
+            <input id="edit_phone">
+        </div>
+
+        <div class="modal-btns">
+            <button class="btn close-btn" onclick="closeModal()">取消</button>
+            <button class="btn" onclick="saveUserInfo()">保存</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    window.onload = function() {
+    let originalUsername = ""; // 保存原来的用户名，用于校验
+
+    window.onload = function () {
+        let userId = localStorage.getItem("userId");
         let username = localStorage.getItem("username");
+        let phone = localStorage.getItem("phone");
         let role = localStorage.getItem("role");
+
+        originalUsername = username;
+
         document.getElementById("welcome").innerText = "欢迎你，" + username;
         document.getElementById("nickname").innerText = username;
         document.getElementById("avatarChar").innerText = username.charAt(0).toUpperCase();
 
         let deleteItem = document.getElementById("deleteItem");
         if (role === "admin") {
-            // 管理员：灰色文字 + 禁用按钮
             deleteItem.innerHTML = `
                 <span class="admin-tip">管理员账户不支持注销</span>
                 <button class="btn" disabled>注销账户</button>
             `;
         } else {
-            // 普通用户：红色按钮
             deleteItem.innerHTML = `
                 <span>注销账户</span>
-                <button class="btn danger" onclick="alert('注销账户功能开发中...')">注销账户</button>
+                <button class="btn danger" onclick="alert('注销功能开发中')">注销账户</button>
             `;
+        }
+    };
+
+    // 打开弹窗
+    function openEditModal() {
+        document.getElementById("edit_id").value = localStorage.getItem("userId");
+        document.getElementById("edit_username").value = localStorage.getItem("username");
+        document.getElementById("edit_phone").value = localStorage.getItem("phone") || "";
+        document.getElementById("editModal").style.display = "flex";
+    }
+
+    // 关闭弹窗
+    function closeModal() {
+        document.getElementById("editModal").style.display = "none";
+    }
+
+    // 保存修改
+    async function saveUserInfo() {
+        let id = document.getElementById("edit_id").value;
+        let username = document.getElementById("edit_username").value.trim();
+        let phone = document.getElementById("edit_phone").value.trim();
+
+        if (!username) {
+            alert("用户名不能为空");
+            return;
+        }
+
+        // 不能和原来名字一样
+        if (username === originalUsername) {
+            alert("新用户名不能和原来一样！");
+            return;
+        }
+
+        let res = await fetch("http://localhost:8080/user/updateInfo", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                id: parseInt(id),
+                username: username,
+                phone: phone
+            })
+        });
+
+        let result = await res.json();
+        if (result.code === 200) {
+            alert("修改成功！");
+            localStorage.setItem("username", username);
+            localStorage.setItem("phone", phone);
+            location.reload();
+        } else {
+            alert("修改失败：" + result.data);
         }
     }
 
     function goBack() {
         let role = localStorage.getItem("role");
-        if (role === "admin") {
-            location.href = "admin.html";
-        } else {
-            location.href = "user_center.html";
-        }
+        location.href = role === "admin" ? "admin.html" : "user_center.html";
     }
 </script>
+
 </body>
 </html>

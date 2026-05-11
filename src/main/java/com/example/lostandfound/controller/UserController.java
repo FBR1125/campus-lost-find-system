@@ -1,5 +1,7 @@
 package com.example.lostandfound.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import com.example.lostandfound.mapper.UserMapper;
 import java.util.Map;
 import java.util.HashMap;
 import com.example.lostandfound.common.Result;
@@ -13,8 +15,13 @@ import jakarta.annotation.Resource;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+
     @Resource
     UserService userService;
+
+    //
+    @Autowired
+    private UserMapper userMapper;
 
     // 注册
     @PostMapping("/register")
@@ -107,4 +114,12 @@ public class UserController {
         map.put("foundCount", foundCount);
         return Result.success("获取成功", map);
     }
+
+    //
+    @PostMapping("/updateInfo")
+    public Result updateInfo(@RequestBody User user) {
+        userMapper.updateUserInfo(user.getId(), user.getUsername(), user.getPhone());
+        return Result.success("修改成功");
+    }
+
 }
