@@ -2,11 +2,12 @@ package com.example.lostandfound.controller;
 
 import com.example.lostandfound.common.Result;
 import com.example.lostandfound.entity.Item;
+import com.example.lostandfound.entity.User;
+import com.example.lostandfound.mapper.ItemMapper;
 import com.example.lostandfound.service.ItemService;
+import com.example.lostandfound.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import com.example.lostandfound.entity.User;
-import com.example.lostandfound.service.UserService;
 
 import java.util.List;
 
@@ -19,6 +20,9 @@ public class ItemController {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private ItemMapper itemMapper;
 
     // 首页展示物品
     @GetMapping("/home")
@@ -95,5 +99,11 @@ public class ItemController {
         } else {
             return Result.error("认领失败");
         }
+    }
+
+    // 搜索接口
+    @GetMapping("/search")
+    public Result<List<Item>> searchItems(@RequestParam String keyword) {
+        return Result.success("搜索成功", itemMapper.searchItems(keyword));
     }
 }

@@ -249,10 +249,19 @@
 
     async function searchItem() {
         let keyword = document.getElementById("keyword").value.trim();
-        let res = await fetch("http://localhost:8080/user/search?keyword=" + encodeURIComponent(keyword));
+
+        // 空内容 → 加载全部
+        if (!keyword) {
+            loadHomeList();
+            document.getElementById("list-title").innerText = "最新失物信息";
+            return;
+        }
+
+        // 有内容 → 搜索物品
+        let res = await fetch("http://localhost:8080/item/search?keyword=" + encodeURIComponent(keyword));
         let result = await res.json();
         renderItems(result.data);
-        document.getElementById("list-title").innerText = keyword ? `"${keyword}" 搜索结果` : "最新失物信息";
+        document.getElementById("list-title").innerText = `"${keyword}" 搜索结果`;
     }
 
     // 渲染物品 + 认领按钮

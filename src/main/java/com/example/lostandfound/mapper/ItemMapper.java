@@ -59,4 +59,8 @@ public interface ItemMapper {
 
     @Update("UPDATE item SET status = #{status} WHERE id = #{id}")
     void updateStatus(@Param("id") Integer id, @Param("status") Integer status);
+
+    // 搜索物品（按名称、地点搜索）
+    @Select("SELECT * FROM item WHERE name LIKE CONCAT('%', #{keyword}, '%') OR place LIKE CONCAT('%', #{keyword}, '%')")
+    List<Item> searchItems(@Param("keyword") String keyword);
 }
