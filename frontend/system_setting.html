@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>系统设置</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f5f7fa;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .header {
+            background: #409eff;
+            padding: 15px 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .container {
+            max-width: 500px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .page-title {
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        /* 头像区域 */
+        .avatar-area {
+            margin-bottom: 25px;
+        }
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #409eff;
+            color: white;
+            font-size: 30px;
+            line-height: 80px;
+            margin: 0 auto 10px;
+        }
+        .nickname {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        /* 设置项 */
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-top: 1px solid #eee;
+        }
+        .setting-item:first-of-type {
+            border-top: none;
+        }
+        .btn {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #409eff;
+            color: white;
+            font-size: 14px;
+        }
+        .btn.danger {
+            background: #f56c6c;
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .back-btn {
+            margin-top: 20px;
+            background: #67c23a;
+        }
+        .admin-tip {
+            color: #999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>校园失物招领系统</h1>
+    <span id="welcome"></span>
+</div>
+
+<div class="container">
+    <div class="page-title">系统设置</div>
+    <div class="card">
+        <!-- 头像 + 昵称区域 -->
+        <div class="avatar-area">
+            <div class="avatar" id="avatarChar"></div>
+            <div class="nickname" id="nickname"></div>
+        </div>
+
+        <!-- 设置项 -->
+        <div class="setting-item">
+            <span>头像</span>
+            <button class="btn" onclick="alert('更换头像功能开发中...')">修改</button>
+        </div>
+        <div class="setting-item">
+            <span>个人信息</span>
+            <button class="btn" onclick="alert('修改个人信息功能开发中...')">修改</button>
+        </div>
+        <div class="setting-item" id="deleteItem">
+            <!-- 内容由JS动态生成 -->
+        </div>
+    </div>
+
+    <button class="btn back-btn" onclick="goBack()">返回</button>
+</div>
+
+<script>
+    window.onload = function() {
+        let username = localStorage.getItem("username");
+        let role = localStorage.getItem("role");
+        document.getElementById("welcome").innerText = "欢迎你，" + username;
+        document.getElementById("nickname").innerText = username;
+        document.getElementById("avatarChar").innerText = username.charAt(0).toUpperCase();
+
+        let deleteItem = document.getElementById("deleteItem");
+        if (role === "admin") {
+            // 管理员：灰色文字 + 禁用按钮
+            deleteItem.innerHTML = `
+                <span class="admin-tip">管理员账户不支持注销</span>
+                <button class="btn" disabled>注销账户</button>
+            `;
+        } else {
+            // 普通用户：红色按钮
+            deleteItem.innerHTML = `
+                <span>注销账户</span>
+                <button class="btn danger" onclick="alert('注销账户功能开发中...')">注销账户</button>
+            `;
+        }
+    }
+
+    function goBack() {
+        let role = localStorage.getItem("role");
+        if (role === "admin") {
+            location.href = "admin.html";
+        } else {
+            location.href = "user_center.html";
+        }
+    }
+</script>
+</body>
+</html>
