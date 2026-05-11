@@ -62,8 +62,6 @@
             text-align: center;
             line-height: 36px;
             font-weight: bold;
-            background-size: cover;
-            background-position: center;
         }
 
         .search-section {
@@ -137,6 +135,7 @@
             font-size: 12px;
         }
 
+        /* 认领按钮样式 */
         .claim-btn {
             background: #409eff;
             color: #fff;
@@ -231,10 +230,12 @@
         let headerRight = document.getElementById("headerRight");
 
         if (isLogin === "true") {
-            let avatarHtml = '';
+            let avatarHtml = "";
             if (avatar) {
-                avatarHtml = `<div class="avatar-img" style="background-image:url(${avatar})"></div>`;
+                // 如果有头像，就用背景图显示
+                avatarHtml = `<div class="avatar-img" style="background-image: url(${avatar}); background-size: cover; background-position: center;"></div>`;
             } else {
+                // 没有头像，就显示用户名首字母
                 avatarHtml = `<div class="avatar-img">${username.charAt(0)}</div>`;
             }
 
@@ -258,17 +259,22 @@
 
     async function searchItem() {
         let keyword = document.getElementById("keyword").value.trim();
+
+        // 空内容 → 加载全部
         if (!keyword) {
             loadHomeList();
             document.getElementById("list-title").innerText = "最新失物信息";
             return;
         }
+
+        // 有内容 → 搜索物品
         let res = await fetch("http://localhost:8080/item/search?keyword=" + encodeURIComponent(keyword));
         let result = await res.json();
         renderItems(result.data);
         document.getElementById("list-title").innerText = `"${keyword}" 搜索结果`;
     }
 
+    // 渲染物品 + 认领按钮
     function renderItems(items) {
         let list = document.getElementById("item-list");
         list.innerHTML = "";
@@ -280,13 +286,27 @@
             let tagClass = item.type === 0 ? "tag-lost" : "tag-found";
             let tagText = item.type === 0 ? "失物" : "招领";
             let claimBtn = "";
+            let foundBtn = "";
+
             if (item.type === 1) {
+                // 招领显示认领按钮
                 if (item.status === 1) {
                     claimBtn = `<button class="claim-btn claimed" disabled>已认领√</button>`;
                 } else {
                     claimBtn = `<button class="claim-btn" onclick="showContact(${item.id})">认领</button>`;
                 }
             }
+
+            // 已适配你的 found_status
+            if (item.type === 0) {
+                let isFound = item.foundStatus || item.found_status || item.foundstatus;
+                if (isFound == 1) {
+                    foundBtn = `<button class="claim-btn claimed" disabled>已找回√</button>`;
+                } else {
+                    foundBtn = `<button class="claim-btn" style="background:#409eff" onclick="markAsFound(${item.id})">我找到了</button>`;
+                }
+            }
+
             list.innerHTML += `
         <div class="item-card">
             <h3>${item.name}</h3>
@@ -294,6 +314,7 @@
             <p>描述：${item.description||'无'}</p>
             <span class="${tagClass}">${tagText}</span>
             ${claimBtn}
+            ${foundBtn}
         </div>`;
         });
     }
@@ -328,9 +349,32 @@
         let claimResult = await claimRes.json();
         if (claimResult.code === 200) {
             alert("认领成功！");
+            // 刷新列表
             loadHomeList();
         } else {
             alert("认领失败：" + claimResult.message);
+        }
+    }
+
+    async function markAsFound(itemId) {
+        let check = confirm("确定已经找回物品？");
+        if (!check) return;
+
+        let res = await fetch("http://localhost:8080/item/markFound", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                itemId: itemId
+            })
+        });
+        let result = await res.json();
+        if (result.code === 200) {
+            alert("已成功确认！");
+            loadHomeList(); // 刷新列表
+        } else {
+            alert("操作失败：" + result.message);
         }
     }
 

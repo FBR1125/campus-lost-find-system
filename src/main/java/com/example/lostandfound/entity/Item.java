@@ -13,6 +13,7 @@ public class Item {
     private Integer status;     // 0待认领 1已认领
     private LocalDateTime createTime;
     private Integer checkStatus; // 0未审核 1通过 2不通过
+    private Integer foundStatus; // 0未找回 1已找回
 
     // Getter & Setter
     public Integer getCheckStatus() { return checkStatus; }
@@ -35,4 +36,10 @@ public class Item {
     public void setStatus(Integer status) { this.status = status; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+    public Integer getFoundStatus() {
+        return foundStatus;
+    }
+    public void setFoundStatus(Integer foundStatus) {
+        this.foundStatus = foundStatus;
+    }
 }

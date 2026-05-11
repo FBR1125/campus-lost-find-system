@@ -51,4 +51,8 @@ public class ItemService {
     public int claimItem(Integer id) {
         return itemMapper.updateStatusToClaimed(id);
     }
+
+    public boolean markItemAsFound(Integer itemId) {
+        return itemMapper.updateItemFoundStatus(itemId) > 0;
+    }
 }

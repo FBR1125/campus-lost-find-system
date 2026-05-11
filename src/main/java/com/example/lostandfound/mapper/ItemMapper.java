@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Result;
 
 public interface ItemMapper {
 
@@ -63,4 +65,8 @@ public interface ItemMapper {
     // 搜索物品（按名称、地点搜索）
     @Select("SELECT * FROM item WHERE name LIKE CONCAT('%', #{keyword}, '%') OR place LIKE CONCAT('%', #{keyword}, '%')")
     List<Item> searchItems(@Param("keyword") String keyword);
+
+    // 标记失物为已找回（更新 found_status = 1）
+    @Update("UPDATE item SET found_status = 1 WHERE id = #{itemId}")
+    int updateItemFoundStatus(@Param("itemId") Integer itemId);
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/item")
@@ -105,5 +106,12 @@ public class ItemController {
     @GetMapping("/search")
     public Result<List<Item>> searchItems(@RequestParam String keyword) {
         return Result.success("搜索成功", itemMapper.searchItems(keyword));
+    }
+
+    @PostMapping("/markFound")
+    public Result markAsFound(@RequestBody Map<String, Integer> map) {
+        Integer itemId = map.get("itemId");
+        boolean success = itemService.markItemAsFound(itemId);
+        return success ? Result.success("标记为已找回成功") : Result.error("操作失败，物品不存在或已找回");
     }
 }
